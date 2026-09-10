@@ -69,26 +69,6 @@ function MenuLateral() {
           </span>
         </NavLink>
 
-        {/* EXPLORE */}
-        <NavLink
-          to="/explore"
-          className={({ isActive }) =>
-            `flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-              isActive
-                ? "text-[var(--color-primary)] bg-secondary-container/50 border-l-4 border-[var(--color-primary)] font-bold"
-                : "text-on-surface-variant hover:bg-surface-container-highest hover:text-[var(--color-primary-container)]"
-            }`
-          }
-        >
-          <span className="material-symbols-outlined">
-            explore
-          </span>
-
-          <span className="font-label-md text-label-md">
-            Explore
-          </span>
-        </NavLink>
-
         {/* EMPRÉSTIMOS */}
         <NavLink
           to="/emprestimos"
