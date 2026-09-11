@@ -125,7 +125,7 @@ function MenuLateral() {
           </span>
 
           <span className="font-label-md text-label-md">
-            Usuários
+            Alunos
           </span>
         </NavLink>
 
