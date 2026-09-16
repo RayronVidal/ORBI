@@ -1,5 +1,8 @@
-import { useState } from "react";
-import Button from "../../../components/Button";
+import { useMemo, useState } from "react";
+import "./Emprestimos.css";
+
+type Aba = "ativos" | "atrasados" | "historico";
+type Status = "Ativo" | "Atrasado";
 
 interface Emprestimo {
   id: number;
@@ -11,500 +14,175 @@ interface Emprestimo {
   dataEmprestimo: string;
   dataDevolucao: string;
   prazo: string;
-  status: "Ativo" | "Atrasado";
+  status: Status;
 }
 
+const emprestimos: Emprestimo[] = [
+  {
+    id: 1,
+    aluno: "Elena Smith",
+    alunoId: "ST-8492",
+    iniciais: "ES",
+    livro: "The Design of Everyday Things",
+    autor: "Don Norman",
+    dataEmprestimo: "12/10/2023",
+    dataDevolucao: "26/10/2023",
+    prazo: "3 dias restantes",
+    status: "Ativo",
+  },
+  {
+    id: 2,
+    aluno: "James Doe",
+    alunoId: "ST-1029",
+    iniciais: "JD",
+    livro: "Introduction to Algorithms",
+    autor: "Thomas H. Cormen",
+    dataEmprestimo: "28/09/2023",
+    dataDevolucao: "12/10/2023",
+    prazo: "11 dias atrasado",
+    status: "Atrasado",
+  },
+  {
+    id: 3,
+    aluno: "Maria Rodriguez",
+    alunoId: "ST-5581",
+    iniciais: "MR",
+    livro: "Sapiens: A Brief History",
+    autor: "Yuval Noah Harari",
+    dataEmprestimo: "20/10/2023",
+    dataDevolucao: "03/11/2023",
+    prazo: "11 dias restantes",
+    status: "Ativo",
+  },
+];
+
+function Icon({ name, size = 20 }: { name: string; size?: number }) {
+  const paths: Record<string, React.ReactNode> = {
+    search: <><circle cx="11" cy="11" r="6.5" /><path d="m16 16 5 5" /></>,
+    bell: <><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" /><path d="M10 21h4" /></>,
+    plus: <><path d="M12 5v14" /><path d="M5 12h14" /></>,
+    filter: <><path d="M4 6h16" /><path d="M7 12h10" /><path d="M10 18h4" /></>,
+    chevronLeft: <path d="m15 18-6-6 6-6" />,
+    chevronRight: <path d="m9 18 6-6-6-6" />,
+    more: <><circle cx="5" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="19" cy="12" r="1" fill="currentColor" stroke="none" /></>,
+  };
+
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {paths[name]}
+    </svg>
+  );
+}
+
+function formatDate(value: string) {
+  const [day, month, year] = value.split("/");
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return { first: `${months[Number(month) - 1]} ${day},`, second: year };
+}
 
 function Emprestimos() {
-  const [aba, setAba] = useState<"ativos" | "atrasados" | "historico">(
-    "ativos"
-  );
-
+  const [aba, setAba] = useState<Aba>("ativos");
   const [aluno, setAluno] = useState("");
   const [livro, setLivro] = useState("");
   const [data, setData] = useState("Qualquer período");
+  const [busca, setBusca] = useState("");
 
-  const [emprestimos] = useState<Emprestimo[]>([
-    {
-      id: 1,
-      aluno: "Elena Smith",
-      alunoId: "ST-8492",
-      iniciais: "ES",
-      livro: "The Design of Everyday Things",
-      autor: "Don Norman",
-      dataEmprestimo: "12/10/2023",
-      dataDevolucao: "26/10/2023",
-      prazo: "3 dias restantes",
-      status: "Ativo",
-    },
-    {
-      id: 2,
-      aluno: "James Doe",
-      alunoId: "ST-1029",
-      iniciais: "JD",
-      livro: "Introduction to Algorithms",
-      autor: "Thomas H. Cormen",
-      dataEmprestimo: "28/09/2023",
-      dataDevolucao: "12/10/2023",
-      prazo: "11 dias atrasado",
-      status: "Atrasado",
-    },
-    {
-      id: 3,
-      aluno: "Maria Rodriguez",
-      alunoId: "ST-5581",
-      iniciais: "MR",
-      livro: "Sapiens: A Brief History",
-      autor: "Yuval Noah Harari",
-      dataEmprestimo: "20/10/2023",
-      dataDevolucao: "03/11/2023",
-      prazo: "11 dias restantes",
-      status: "Ativo",
-    },
-  ]);
+  const contagemAtivos = emprestimos.filter((item) => item.status === "Ativo").length;
+  const contagemAtrasados = emprestimos.filter((item) => item.status === "Atrasado").length;
 
-  const emprestimosFiltrados = emprestimos.filter((emprestimo) => {
-    const correspondeAluno =
-      aluno === "" ||
-      emprestimo.aluno.toLowerCase().includes(aluno.toLowerCase()) ||
-      emprestimo.alunoId.toLowerCase().includes(aluno.toLowerCase());
-
-    const correspondeLivro =
-      livro === "" ||
-      emprestimo.livro.toLowerCase().includes(livro.toLowerCase()) ||
-      emprestimo.autor.toLowerCase().includes(livro.toLowerCase());
-
-    const correspondeAba =
-      aba === "ativos"
-        ? emprestimo.status === "Ativo"
-        : aba === "atrasados"
-        ? emprestimo.status === "Atrasado"
-        : true;
-
-    return correspondeAluno && correspondeLivro && correspondeAba;
-  });
+  const filtrados = useMemo(() => emprestimos.filter((item) => {
+    const termo = busca.trim().toLowerCase();
+    const correspondeBusca = !termo || [item.aluno, item.alunoId, item.livro, item.autor].some((v) => v.toLowerCase().includes(termo));
+    const correspondeAluno = !aluno || item.aluno.toLowerCase().includes(aluno.toLowerCase()) || item.alunoId.toLowerCase().includes(aluno.toLowerCase());
+    const correspondeLivro = !livro || item.livro.toLowerCase().includes(livro.toLowerCase()) || item.autor.toLowerCase().includes(livro.toLowerCase());
+    const correspondeAba = aba === "historico" || (aba === "ativos" ? item.status === "Ativo" : item.status === "Atrasado");
+    return correspondeBusca && correspondeAluno && correspondeLivro && correspondeAba;
+  }), [aba, aluno, livro, busca]);
 
   return (
-    <div className="min-h-screen bg-background font-body-md text-on-background ">
-
-      {/* CONTEÚDO PRINCIPAL */}
-      <main className="flex min-h-screen flex-1 flex-col p-[var(--margin-desktop)] bg-[var(--color-background)] font-[var(--font-family-base) rounded-lg ">
-
-        {/* TOPBAR */}
-        <header className=" flex h-16 items-center justify-between border-b mb-[var(--line-height-label-lg)]  border-[var(--color-secondary)] border-outline-variant bg-surface px-gutter">
-
-          <div className="flex flex-1 items-center gap-4">
-
-            {/* Busca */}
-            <div className="relative hidden w-full max-w-md md:block text-[var(--color-on-surface-variant)]">
-
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">
-                search
-              </span>
-
-              <input
-                type="text"
-                placeholder="Pesquisar empréstimos, alunos ou livros..."
-                className="w-full rounded-lg border border-outline-variant bg-surface-container-low py-2 pl-10 pr-4 text-body-md transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-              />
-
-            </div>
-
-          </div>
-
-          {/* Notificação e usuário */}
-          <div className="flex items-center gap-2">
-
-            <button
-              type="button"
-              className="relative rounded-full p-2 text-on-surface-variant transition-all hover:bg-surface-container-low"
-            >
-              <span className="material-symbols-outlined cursor-pointer hover:text-[var(--color-primary)]">
-                notifications
-              </span>
-
-              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-error" />
-            </button>
-
-          </div>
-        </header>
-
-        {/* CONTEÚDO DA PÁGINA */}
-        <div className="flex-1 p-margin_mobile md:p-margin_desktop">
-
-          {/* Título */}
-          <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-
-            <div>
-              <h2 className="font-headline-lg text-headline-lg text-on-surface font text-2xl text-(--color-on-surface-variant) font-semibold">
-                Gerenciamento de Empréstimos
-              </h2>
-
-              <p className="text-[var(--color-on-surface-variant)] mt-1 font-body-md text-body-md text-on-surface-variant">
-                Gerencie os empréstimos, acompanhe os atrasos e processe as devoluções.
-              </p>
-            </div>
-
-            {/* componente */}
-            {<Button text="Novo Empréstimo" icon="add" NomeClasse="material-symbols-outlined"/>}
-          </div>
-
-          {/* ABAS */}
-          <div className="mb-6 flex overflow-x-auto border-b border-outline-variant no-scrollbar">
-
-            <button
-              type="button"
-              onClick={() => setAba("ativos")}
-              className={`whitespace-nowrap px-6 py-3 font-label-md text-label-lg ${
-                aba === "ativos"
-                  ? "border-b-2 border-b-[var(--color-primary-container)] border-primary font-bold text-primary"
-                  : "text-on-surface-variant hover:bg-surface-container-low"
-              }`}
-            >
-              Empréstimos Ativos (
-              {emprestimos.filter((item) => item.status === "Ativo").length}
-              )
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setAba("atrasados")}
-              className={`whitespace-nowrap border-b-[var(--color-primary-container)] px-6 py-3 font-label-md text-label-lg ${
-                aba === "atrasados"
-                  ? "border-b-2 border-primary font-bold text-primary"
-                  : "text-on-surface-variant hover:bg-surface-container-low"
-              }`}
-            >
-              Atrasados (
-              {emprestimos.filter((item) => item.status === "Atrasado").length}
-              )
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setAba("historico")}
-              className={`whitespace-nowrap border-b-[var(--color-primary-container)] px-6 py-3 font-label-md text-label-lg ${
-                aba === "historico"
-                  ? "border-b-2 border-primary font-bold text-primary"
-                  : "text-on-surface-variant hover:bg-surface-container-low"
-              }`}
-            >
-              Histórico
-            </button>
-
-          </div>
-
-          {/* FILTROS */}
-          <div className="mb-6 flex flex-col gap-4 rounded-xl border border-outline-variant bg-surface-container-lowest p-4 md:flex-row">
-
-            <div className="flex-1">
-              <label className="mb-1 block font-label-md text-label-md font-bold text-on-surface">
-                Aluno
-              </label>
-
-              <input
-                type="text"
-                placeholder="Nome ou ID"
-                value={aluno}
-                onChange={(e) => setAluno(e.target.value)}
-                className="w-full rounded-lg border border-outline-variant bg-surface-bright px-3 py-2 text-body-md focus:border-primary focus:ring-1 focus:ring-primary"
-              />
-            </div>
-
-            <div className="flex-1">
-              <label className="mb-1 block font-label-md text-label-md font-bold text-on-surface">
-                Livro
-              </label>
-
-              <input
-                type="text"
-                placeholder="Título ou ISBN"
-                value={livro}
-                onChange={(e) => setLivro(e.target.value)}
-                className="w-full rounded-lg border border-outline-variant bg-surface-bright px-3 py-2 text-body-md focus:border-primary focus:ring-1 focus:ring-primary"
-              />
-            </div>
-
-            <div className="flex-1">
-              <label className="mb-1 block font-label-md text-label-md font-bold text-on-surface">
-                Data de devolução
-              </label>
-
-              <select
-                value={data}
-                onChange={(e) => setData(e.target.value)}
-                className="w-full rounded-lg border border-outline-variant bg-surface-bright px-3 py-2 text-body-md focus:border-primary focus:ring-1 focus:ring-primary"
-              >
-                <option>Qualquer período</option>
-                <option>Vence hoje</option>
-                <option>Vence esta semana</option>
-              </select>
-            </div>
-
-            <div className="flex items-end">
-              <button
-                type="button"
-                className="flex items-center gap-2 rounded-lg border border-outline-variant px-4 py-2 text-on-surface transition-colors hover:bg-surface-container-low"
-              >
-                <span className="material-symbols-outlined text-sm">
-                  filter_list
-                </span>
-
-                Filtrar
-              </button>
-            </div>
-
-          </div>
-
-          {/* TABELA */}
-          <div className="overflow-hidden rounded-xl border border-outline-variant bg-surface-container-lowest shadow-sm">
-
-            <div className="overflow-x-auto">
-
-              <table className="w-full border-collapse text-left">
-
-                <thead>
-                  <tr className="border-b border-outline-variant bg-surface-container">
-
-                    <th className="px-6 py-4 font-label-md text-label-md font-bold uppercase tracking-wider text-on-surface-variant">
-                      Aluno
-                    </th>
-
-                    <th className="px-6 py-4 font-label-md text-label-md font-bold uppercase tracking-wider text-on-surface-variant">
-                      Livro
-                    </th>
-
-                    <th className="px-6 py-4 font-label-md text-label-md font-bold uppercase tracking-wider text-on-surface-variant">
-                      Empréstimo
-                    </th>
-
-                    <th className="px-6 py-4 font-label-md text-label-md font-bold uppercase tracking-wider text-on-surface-variant">
-                      Devolução
-                    </th>
-
-                    <th className="px-6 py-4 font-label-md text-label-md font-bold uppercase tracking-wider text-on-surface-variant">
-                      Status
-                    </th>
-
-                    <th className="px-6 py-4 text-right font-label-md text-label-md font-bold uppercase tracking-wider text-on-surface-variant">
-                      Ações
-                    </th>
-
-                  </tr>
-                </thead>
-
-                <tbody className="divide-y divide-outline-variant/50">
-
-                  {emprestimosFiltrados.map((emprestimo) => (
-
-                    <tr
-                      key={emprestimo.id}
-                      className={`group transition-colors hover:bg-surface-container-low ${
-                        emprestimo.status === "Atrasado"
-                          ? "bg-error-container/10"
-                          : ""
-                      }`}
-                    >
-
-                      {/* Aluno */}
-                      <td className="px-6 py-4">
-
-                        <div className="flex items-center gap-3">
-
-                          <div>
-
-                            <p className="font-label-lg text-label-lg text-on-surface">
-                              {emprestimo.aluno}
-                            </p>
-
-                            <p className="font-label-md text-label-md text-on-surface-variant">
-                              ID: {emprestimo.alunoId}
-                            </p>
-
-                          </div>
-
-                        </div>
-
-                      </td>
-
-                      {/* Livro */}
-                      <td className="px-6 py-4">
-
-                        <p className="font-label-lg text-label-lg text-on-surface">
-                          {emprestimo.livro}
-                        </p>
-
-                        <p className="font-label-md text-label-md text-on-surface-variant">
-                          {emprestimo.autor}
-                        </p>
-
-                      </td>
-
-                      {/* Data empréstimo */}
-                      <td className="px-6 py-4 font-body-md text-body-md text-on-surface-variant">
-                        {emprestimo.dataEmprestimo}
-                      </td>
-
-                      {/* Data devolução */}
-                      <td className="px-6 py-4">
-
-                        <p
-                          className={`font-label-lg text-label-lg ${
-                            emprestimo.status === "Atrasado"
-                              ? "font-bold text-error"
-                              : "text-on-surface"
-                          }`}
-                        >
-                          {emprestimo.dataDevolucao}
-                        </p>
-
-                        <p
-                          className={`font-label-md text-label-md ${
-                            emprestimo.status === "Atrasado"
-                              ? "text-error"
-                              : "text-on-surface-variant"
-                          }`}
-                        >
-                          {emprestimo.prazo}
-                        </p>
-
-                      </td>
-
-                      {/* Status */}
-                      <td className="px-6 py-4">
-
-                        <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 font-label-md text-label-md ${
-                            emprestimo.status === "Atrasado"
-                              ? "bg-error-container text-on-error-container"
-                              : "bg-tertiary-fixed text-on-tertiary-fixed-variant"
-                          }`}
-                        >
-                          {emprestimo.status}
-                        </span>
-
-                      </td>
-
-                      {/* Ações */}
-                      <td className="px-6 py-4 text-right">
-
-                        <div className="flex items-center justify-end gap-2 opacity-0 transition-opacity group-hover:opacity-100">
-
-                          {emprestimo.status === "Atrasado" && (
-                            <button
-                              type="button"
-                              onClick={() =>
-                                alert(
-                                  `Lembrete enviado para ${emprestimo.aluno}`
-                                )
-                              }
-                              className="rounded p-1.5 text-error transition-colors hover:bg-error-container"
-                              title="Enviar lembrete"
-                            >
-                              <span className="material-symbols-outlined text-xl hover:text-[var(--color-on-primary-fixed-variant)]">
-                                mail
-                              </span>
-                            </button>
-                          )}
-
-                          <button
-                            type="button"
-                            onClick={() =>
-                              alert(
-                                `Devolução registrada: ${emprestimo.livro}`
-                              )
-                            }
-                            className="rounded p-1.5 text-primary transition-colors hover:bg-primary-fixed"
-                            title="Registrar devolução"
-                          >
-                            <span className="material-symbols-outlined text-xl">
-                              assignment_return
-                            </span>
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() =>
-                              alert(`Empréstimo #${emprestimo.id}`)
-                            }
-                            className="rounded p-1.5 text-on-surface-variant transition-colors hover:bg-surface-container-high"
-                            title="Mais opções"
-                          >
-                            <span className="material-symbols-outlined text-xl">
-                              more_vert
-                            </span>
-                          </button>
-
-                        </div>
-
-                      </td>
-
-                    </tr>
-
-                  ))}
-
-                </tbody>
-
-              </table>
-
-            </div>
-
-            {/* PAGINAÇÃO */}
-            <div className="flex items-center justify-between border-t border-outline-variant bg-surface-container-lowest px-6 py-4">
-
-              <p className="font-label-md text-label-md text-on-surface-variant">
-                Mostrando {emprestimosFiltrados.length} empréstimos
-              </p>
-
-              <div className="flex gap-1">
-
-                <button
-                  type="button"
-                  disabled
-                  className="rounded p-1 text-outline hover:bg-surface-container-high disabled:opacity-50"
-                >
-                  <span className="material-symbols-outlined">
-                    chevron_left
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  className="flex h-8 w-8 items-center justify-center rounded bg-primary-container font-label-md text-label-md text-on-primary"
-                >
-                  1
-                </button>
-
-                <button
-                  type="button"
-                  className="flex h-8 w-8 items-center justify-center rounded font-label-md text-label-md text-on-surface hover:bg-surface-container-high"
-                >
-                  2
-                </button>
-
-                <button
-                  type="button"
-                  className="flex h-8 w-8 items-center justify-center rounded font-label-md text-label-md text-on-surface hover:bg-surface-container-high"
-                >
-                  3
-                </button>
-
-                <button
-                  type="button"
-                  className="rounded p-1 text-on-surface hover:bg-surface-container-high"
-                >
-                  <span className="material-symbols-outlined">
-                    chevron_right
-                  </span>
-                </button>
-
-              </div>
-
-            </div>
-
-          </div>
-
+    <div className="loans-page">
+      <header className="loans-topbar">
+        <div className="topbar-search">
+          <Icon name="search" size={21} />
+          <input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Search loans, students, or books..." />
         </div>
+        <div className="topbar-actions">
+          <button   className="icon-button notification" aria-label="Notificações"><Icon name="bell" size={22} /><span /></button>
+          <div className="profile-avatar">HU</div>
+        </div>
+      </header>
+
+      <main className="loans-content">
+        <section className="loans-heading">
+          <div>
+            <h1>Loan Management</h1>
+            <p>Manage active book loans, track overdue items, and process returns.</p>
+          </div>
+          <button className="new-loan-button"><Icon name="plus" size={21} /> New Loan</button>
+        </section>
+
+        <div className="loan-tabs" role="tablist">
+          <button className={aba === "ativos" ? "active" : ""} onClick={() => setAba("ativos")} role="tab">Active Loans ({contagemAtivos + contagemAtrasados + 19})</button>
+          <button className={aba === "atrasados" ? "active" : ""} onClick={() => setAba("atrasados")} role="tab">Overdue ({contagemAtrasados + 2})</button>
+          <button className={aba === "historico" ? "active" : ""} onClick={() => setAba("historico")} role="tab">History</button>
+        </div>
+
+        <section className="filter-card">
+          <label>
+            <span>Student</span>
+            <input value={aluno} onChange={(e) => setAluno(e.target.value)} placeholder="Name or ID" />
+          </label>
+          <label>
+            <span>Book Title</span>
+            <input value={livro} onChange={(e) => setLivro(e.target.value)} placeholder="Title or ISBN" />
+          </label>
+          <label>
+            <span>Due Date</span>
+            <select value={data} onChange={(e) => setData(e.target.value)}>
+              <option>Qualquer período</option>
+              <option>Vence hoje</option>
+              <option>Vence esta semana</option>
+            </select>
+          </label>
+          <button className="filter-button"><Icon name="filter" size={17} /> Filter</button>
+        </section>
+
+        <section className="table-card">
+          <div className="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>STUDENT</th><th>BOOK DETAILS</th><th>LOAN DATE</th><th>DUE DATE</th><th>STATUS</th><th>ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtrados.map((item) => {
+                  const loan = formatDate(item.dataEmprestimo);
+                  const due = formatDate(item.dataDevolucao);
+                  return (
+                    <tr key={item.id} className={item.status === "Atrasado" ? "overdue-row" : ""}>
+                      <td>
+                        <div className="student-cell"><div className="initials">{item.iniciais}</div><div><strong>{item.aluno}</strong><small>ID: {item.alunoId}</small></div></div>
+                      </td>
+                      <td><div className="book-cell"><strong>{item.livro}</strong><small>{item.autor}</small></div></td>
+                      <td><div className="date-cell"><span>{loan.first}</span><span>{loan.second}</span></div></td>
+                      <td><div className={`date-cell ${item.status === "Atrasado" ? "danger" : ""}`}><span>{due.first}</span><span>{due.second}</span><small>{item.prazo}</small></div></td>
+                      <td><span className={`status-pill ${item.status === "Atrasado" ? "overdue" : "active"}`}>{item.status}</span></td>
+                      <td><button className="more-button" aria-label={`Ações para ${item.aluno}`}><Icon name="more" size={20} /> </button></td>
+                    </tr>                                                  
+                  );
+                })}
+                {filtrados.length === 0 && <tr><td colSpan={6} className="empty-row">Nenhum empréstimo encontrado.</td></tr>}
+              </tbody>
+            </table>
+          </div>
+          <footer className="table-footer">
+            <span>Showing {filtrados.length || 0} of 24 loans</span>
+            <div className="pagination">
+              <button disabled><Icon name="chevronLeft" size={19} /></button><button className="selected">1</button><button>2</button><button>3</button><button><Icon name="chevronRight" size={19} /></button>
+            </div>
+          </footer>
+        </section>
       </main>
     </div>
   );
