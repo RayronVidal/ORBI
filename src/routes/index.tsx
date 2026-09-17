@@ -1,23 +1,21 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AcesseSuaConta from "../pages/Auth/AcesseSuaConta/AcesseSuaConta";
 import Inicio from "../pages/Library/Inicio/Inicio";
-import MenuLateral from "../components/MenuLateral/MenuLateral";
+import Layout from "../layouts/Layout";
+import Emprestimos from "../pages/Library/GestaoEmprestimos/Emprestimos";
 
 export function Rotas(){
     return (
-    <BrowserRouter>
-            <MenuLateral />
-            <main className="ml-[280px] min-h-screen">
-                <Routes>
-                    <Route path="/" element={<AcesseSuaConta />} />
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={<AcesseSuaConta />} />
+
+                <Route element={<Layout />}>
                     <Route path="/inicio" element={<Inicio />} />
-                    <Route path="/menu" element={<MenuLateral />} />
-                </Routes>
-            </main>
-    </BrowserRouter>
-
-
-    )
+                    <Route path="/emprestimos" element={<Emprestimos />} />
+                </Route>
+            </Routes>
+        </BrowserRouter>
+    );
 }
 export default Rotas;
-

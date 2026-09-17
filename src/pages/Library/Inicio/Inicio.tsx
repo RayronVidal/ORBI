@@ -1,8 +1,10 @@
 
+import Button from "../../../components/Button";
+
 export default function Inicio() {
   return (
-      <main className="min-h-screen overflow-y-auto bg-[var(--color-background)] text-[var(--color-on-background)] font-[var(--font-family-base)]">
-      <div className="flex-1 overflow-y-auto p-[var(--margin-desktop)] pb-24">
+      <main className="min-h-screen overflow-y-auto bg-[var(--color-background)] rounded-lg text-[var(--color-on-background)] font-[var(--font-family-base)]">
+      <div className="flex-1 overflow-y-auto p-[var(--margin-desktop)] pb-24 shadow-lg">
         <div className="max-w-[var(--container-max-widt)] display-right space-y-[var(--stack-lg)]">
           <div className="flex justify-between items-end">
             <div>
@@ -13,12 +15,8 @@ export default function Inicio() {
                 Status do sistema e principais métricas
               </p>
             </div>
-            <button className="bg-[var(--color-on-primary)] text-[var(--color-on-primary)] border-2 border-[var(--color-surface-container-highest)] px-4 py-2 rounded-lg font-medium text-[var(--font-size-label-md)] flex items-center gap-2  hover:bg-[var(--color-primary-container)] hover:text-white transition-colors">
-              <span className="material-symbols-outlined text-[18px]">
-                download
-              </span>
-              Exportar relatório
-            </button>
+            
+            {<Button text="Exportar relatório" NomeClasse="material-symbols-outlined" icon="download"/>}
           </div>
           
 
