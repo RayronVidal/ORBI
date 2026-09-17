@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import "./Emprestimos.css";
+import Button from "../../../components/Button";
 
 type Aba = "ativos" | "atrasados" | "historico";
 type Status = "Ativo" | "Atrasado";
@@ -118,7 +119,8 @@ function Emprestimos() {
             <h1>Loan Management</h1>
             <p>Manage active book loans, track overdue items, and process returns.</p>
           </div>
-          <button className="new-loan-button"><Icon name="plus" size={21} /> New Loan</button>
+          {/* <button className="new-loan-button"><Icon name="plus" size={21} /> New Loan</button> */}
+          {<Button text="Novo Empréstimo" icon="add" NomeClasse="material-symbols-outlined"/>} 
         </section>
 
         <div className="loan-tabs" role="tablist">
