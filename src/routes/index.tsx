@@ -8,10 +8,10 @@ export function Rotas(){
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={<AcesseSuaConta />} />
+                <Route path="/login" element={<AcesseSuaConta />} />
 
                 <Route element={<Layout />}>
-                    <Route path="/inicio" element={<Inicio />} />
+                    <Route path="/dashboard" element={<Inicio />} />
                     <Route path="/emprestimos" element={<Emprestimos />} />
                 </Route>
             </Routes>
