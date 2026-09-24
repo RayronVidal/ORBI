@@ -31,7 +31,7 @@ function MenuLateral() {
 
         {/* PAINEL */}
         <NavLink
-          to="/inicio"
+          to="/dashboard"
           className={({ isActive }) =>
             `flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
               isActive
