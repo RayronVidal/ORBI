@@ -47,7 +47,7 @@ function MenuLateral() {
       <span className="material-symbols-outlined shrink-0" aria-hidden="true">
         {link.icon}
       </span>
-      {!recolhido && <span className="font-label-md text-label-md whitespace-nowrap">{link.label}</span>}
+      <span className={`font-label-md text-label-md whitespace-nowrap ${recolhido ? 'md:hidden' : ''}`}>{link.label}</span>
     </NavLink>
   );
 
@@ -84,7 +84,7 @@ function MenuLateral() {
       <nav
         aria-label="Navegação principal"
         className={`fixed left-0 top-0 z-[80] flex h-dvh flex-col border-r border-outline-variant bg-[var(--color-background)] py-6 transition-[width,transform] duration-300 ease-in-out
-          ${recolhido ? 'w-20' : 'w-[280px]'}
+          w-[280px]
           ${menuMobileAberto ? 'translate-x-0' : '-translate-x-full'}
           md:translate-x-0 ${recolhido ? 'md:w-20' : 'md:w-[280px]'}`}
       >
