@@ -77,8 +77,9 @@ function Icon({ name, size = 20 }: { name: string; size?: number }) {
 
 function formatDate(value: string) {
   const [day, month, year] = value.split("/");
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return { first: `${months[Number(month) - 1]} ${day},`, second: year };
+  // Traduzido para os meses em Português
+  const months = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+  return { first: `${day} de ${months[Number(month) - 1]},`, second: year };
 }
 
 function Emprestimos() {
@@ -105,10 +106,10 @@ function Emprestimos() {
       <header className="loans-topbar">
         <div className="topbar-search">
           <Icon name="search" size={21} />
-          <input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Search loans, students, or books..." />
+          <input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Buscar empréstimos, alunos ou livros..." />
         </div>
         <div className="topbar-actions">
-          <button   className="icon-button notification" aria-label="Notificações"><Icon name="bell" size={22} /><span /></button>
+          <button className="icon-button notification" aria-label="Notificações"><Icon name="bell" size={22} /><span /></button>
           <div className="profile-avatar">HU</div>
         </div>
       </header>
@@ -116,37 +117,36 @@ function Emprestimos() {
       <main className="loans-content">
         <section className="loans-heading">
           <div>
-            <h1>Loan Management</h1>
-            <p>Manage active book loans, track overdue items, and process returns.</p>
+            <h1>Gerenciamento de Empréstimos</h1>
+            <p>Gerencie empréstimos ativos de livros, acompanhe itens atrasados e processe devoluções.</p>
           </div>
-          {/* <button className="new-loan-button"><Icon name="plus" size={21} /> New Loan</button> */}
           {<Button text="Novo Empréstimo" icon="add" NomeClasse="material-symbols-outlined"/>} 
         </section>
 
         <div className="loan-tabs" role="tablist">
-          <button className={aba === "ativos" ? "active" : ""} onClick={() => setAba("ativos")} role="tab">Active Loans ({contagemAtivos + contagemAtrasados + 19})</button>
-          <button className={aba === "atrasados" ? "active" : ""} onClick={() => setAba("atrasados")} role="tab">Overdue ({contagemAtrasados + 2})</button>
-          <button className={aba === "historico" ? "active" : ""} onClick={() => setAba("historico")} role="tab">History</button>
+          <button className={aba === "ativos" ? "active" : ""} onClick={() => setAba("ativos")} role="tab">Empréstimos Ativos ({contagemAtivos + contagemAtrasados + 19})</button>
+          <button className={aba === "atrasados" ? "active" : ""} onClick={() => setAba("atrasados")} role="tab">Atrasados ({contagemAtrasados + 2})</button>
+          <button className={aba === "historico" ? "active" : ""} onClick={() => setAba("historico")} role="tab">Histórico</button>
         </div>
 
         <section className="filter-card">
           <label>
-            <span>Student</span>
-            <input value={aluno} onChange={(e) => setAluno(e.target.value)} placeholder="Name or ID" />
+            <span>Aluno</span>
+            <input value={aluno} onChange={(e) => setAluno(e.target.value)} placeholder="Nome ou ID" />
           </label>
           <label>
-            <span>Book Title</span>
-            <input value={livro} onChange={(e) => setLivro(e.target.value)} placeholder="Title or ISBN" />
+            <span>Título do Livro</span>
+            <input value={livro} onChange={(e) => setLivro(e.target.value)} placeholder="Título ou ISBN" />
           </label>
           <label>
-            <span>Due Date</span>
+            <span>Data de Vencimento</span>
             <select value={data} onChange={(e) => setData(e.target.value)}>
               <option>Qualquer período</option>
               <option>Vence hoje</option>
               <option>Vence esta semana</option>
             </select>
           </label>
-          <button className="filter-button"><Icon name="filter" size={17} /> Filter</button>
+          <button className="filter-button"><Icon name="filter" size={17} /> Filtrar</button>
         </section>
 
         <section className="table-card">
@@ -154,7 +154,7 @@ function Emprestimos() {
             <table>
               <thead>
                 <tr>
-                  <th>STUDENT</th><th>BOOK DETAILS</th><th>LOAN DATE</th><th>DUE DATE</th><th>STATUS</th><th>ACTIONS</th>
+                  <th>ALUNO</th><th>DETALHES DO LIVRO</th><th>DATA DE EMPRÉSTIMO</th><th>DATA DE DEVOLUÇÃO</th><th>STATUS</th><th>AÇÕES</th>
                 </tr>
               </thead>
               <tbody>
@@ -179,15 +179,13 @@ function Emprestimos() {
             </table>
           </div>
           <footer className="table-footer">
-            <span>Showing {filtrados.length || 0} of 24 loans</span>
-            <div className="pagination">
-              <button disabled><Icon name="chevronLeft" size={19} /></button><button className="selected">1</button><button>2</button><button>3</button><button><Icon name="chevronRight" size={19} /></button>
-            </div>
+            <span>Exibindo {filtrados.length || 0} de 24 empréstimos</span>
           </footer>
         </section>
       </main>
     </div>
   );
 }
+
 
 export default Emprestimos;

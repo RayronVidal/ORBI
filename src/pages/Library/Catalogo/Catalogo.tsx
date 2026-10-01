@@ -34,7 +34,9 @@ function Catalogo() {
               <span className="material-symbols-outlined">notifications</span>
               <span className="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
             </button>
+
             <div className="h-8 w-px bg-outline-variant mx-2 hidden md:block"></div>
+
             <button className="flex items-center gap-2 hover:bg-[var(--color-surface-container-low)] p-1 pr-3 rounded-full transition-all">
               <img
                 className="w-8 h-8 rounded-full object-cover border border-[var(--color-outline-variant)]"
@@ -45,6 +47,7 @@ function Catalogo() {
                 Librarian J.
               </span>
             </button>
+            
           </div>
         </header>
         
@@ -131,9 +134,9 @@ function Catalogo() {
               <table className="w-full text-left border-collapse min-w-[800px]">
                 <thead>
                   <tr className="bg-[var(--color-surface-container)] text-[var(--color-on-surface-variant)] font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] uppercase tracking-wider border-b border-[var(--color-outline-variant)]">
-                    <th className="py-3 px-4 font-medium w-12 text-center">
+                    <th className="py-3 font-medium w-2 text-center">
                       <input
-                        className="rounded border-[var(--color-outline-variant)] text-[var(--color-primary)] focus:ring-primary"
+                        className="rounded border-[var(--color-outline-variant)] text-[var(--color-primary)] focus:ring-primary m-0"
                         type="checkbox"
                       />
                     </th>
@@ -148,82 +151,10 @@ function Catalogo() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--color-surface-container-high)] bg-[var(--color-surface-container-lowest)]">
-                  {/* Row 1 */}
-                  <tr className="hover:bg-[var(--color-surface-container-low)] transition-colors group">
-                    <td className="py-3 px-4 text-center">
-                      <input
-                        className="rounded border-[var(--color-outline-variant)] text-[var(--color-primary)] focus:ring-primary"
-                        type="checkbox"
-                      />
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-14 bg-[var(--color-surface-container-highest)] rounded flex items-center justify-center shrink-0">
-                          <span className="material-symbols-outlined text-[var(--color-outline)]">
-                            menu_book
-                          </span>
-                        </div>
-                        <div>
-                          <p className="font-[var(--font-family-base)] text-[length:var(--font-size-title-lg)] text-[var(--color-on-surface)] font-semibold line-clamp-1">
-                            The Design of Everyday Things
-                          </p>
-                          <p className="font-[var(--font-family-base)] text-[length:var(--font-size-body-md)] text-[var(--color-on-surface-variant)] line-clamp-1">
-                            Don Norman
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4 font-[var(--font-family-base)] text-[length:var(--font-size-body-md)] text-[var(--color-on-surface)]">
-                      978-0465050659
-                    </td>
-                    <td className="py-3 px-4">
-                      <p className="font-[var(--font-family-base)] text-[length:var(--font-size-body-md)] text-[var(--color-on-surface)]">
-                        Design
-                      </p>
-                      <p className="font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] text-[var(--color-on-surface-variant)]">
-                        Non-Ficção
-                      </p>
-                    </td>
-                    <td className="py-3 px-4 font-[var(--font-family-base)] text-[length:var(--font-size-body-md)] text-[var(--color-on-surface)]">
-                      A2 - Estante 4
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[var(--color-tertiary-fixed)] text-[var(--color-on-tertiary-fixed)]">
-                        Disponível
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <div className="flex items-center justify-end gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                        <button
-                          className="p-1.5 text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)] hover:bg-[var(--color-surface-container)] rounded-md transition-colors"
-                          title="Generate QR"
-                        >
-                          <span className="material-symbols-outlined text-[18px]">
-                            menu_menu_book
-                          </span>
-                        </button>
-                        <button
-                          className="p-1.5 text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)] hover:bg-[var(--color-surface-container)] rounded-md transition-colors"
-                          title="Edit"
-                        >
-                          <span className="material-symbols-outlined text-[18px]">
-                            settings
-                          </span>
-                        </button>
-                        <button
-                          className="p-1.5 text-[var(--color-on-surface-variant)] hover:text-[var(--color-error)] hover:bg-[var(--color-error-container)] rounded-md transition-colors"
-                          title="Delete"
-                        >
-                          <span className="material-symbols-outlined text-[18px]">
-                            logout
-                          </span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
 
-                  {/* Row 2 */}
-                  <tr className="hover:bg-[var(--color-surface-container-low)] transition-colors group">
+
+                  {/* Row 1 */}
+                <tr className="hover:bg-[var(--color-surface-container-low)] transition-colors group">
                     <td className="py-3 px-4 text-center">
                       <input
                         className="rounded border-[var(--color-outline-variant)] text-[var(--color-primary)] focus:ring-primary"
@@ -294,81 +225,8 @@ function Catalogo() {
                         </button>
                       </div>
                     </td>
-                  </tr>
+                </tr>
 
-                  {/* Row 3 */}
-                  <tr className="hover:bg-[var(--color-surface-container-low)] transition-colors group">
-                    <td className="py-3 px-4 text-center">
-                      <input
-                        className="rounded border-[var(--color-outline-variant)] text-[var(--color-primary)] focus:ring-primary"
-                        type="checkbox"
-                      />
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-14 bg-[var(--color-surface-container-highest)] rounded flex items-center justify-center shrink-0">
-                          <span className="material-symbols-outlined text-[var(--color-outline)]">
-                            menu_book
-                          </span>
-                        </div>
-                        <div>
-                          <p className="font-[var(--font-family-base)] text-[length:var(--font-size-title-lg)] text-[var(--color-on-surface)] font-semibold line-clamp-1">
-                            Sapiens: A Brief História of Humankind
-                          </p>
-                          <p className="font-[var(--font-family-base)] text-[length:var(--font-size-body-md)] text-[var(--color-on-surface-variant)] line-clamp-1">
-                            Yuval Noah Harari
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4 font-[var(--font-family-base)] text-[length:var(--font-size-body-md)] text-[var(--color-on-surface)]">
-                      978-0062316097
-                    </td>
-                    <td className="py-3 px-4">
-                      <p className="font-[var(--font-family-base)] text-[length:var(--font-size-body-md)] text-[var(--color-on-surface)]">
-                        História
-                      </p>
-                      <p className="font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] text-[var(--color-on-surface-variant)]">
-                        Non-Ficção
-                      </p>
-                    </td>
-                    <td className="py-3 px-4 font-[var(--font-family-base)] text-[length:var(--font-size-body-md)] text-[var(--color-on-surface)]">
-                      H3 - Estante 1
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] font-medium bg-[var(--color-secondary-fixed)] text-[var(--color-on-secondary-fixed-variant)]">
-                        Reservado
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button
-                          className="p-1.5 text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)] hover:bg-[var(--color-surface-container)] rounded-md transition-colors"
-                          title="Generate QR"
-                        >
-                          <span className="material-symbols-outlined text-[18px]">
-                            menu_menu_book
-                          </span>
-                        </button>
-                        <button
-                          className="p-1.5 text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)] hover:bg-[var(--color-surface-container)] rounded-md transition-colors"
-                          title="Edit"
-                        >
-                          <span className="material-symbols-outlined text-[18px]">
-                            settings
-                          </span>
-                        </button>
-                        <button
-                          className="p-1.5 text-[var(--color-on-surface-variant)] hover:text-[var(--color-error)] hover:bg-[var(--color-error-container)] rounded-md transition-colors"
-                          title="Delete"
-                        >
-                          <span className="material-symbols-outlined text-[18px]">
-                            logout
-                          </span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
                 </tbody>
               </table>
             </div>
@@ -486,17 +344,7 @@ function Catalogo() {
                       <option>Non-Ficção</option>
                     </select>
                   </div>
-                  <div className="space-y-1">
-                    <label className="font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] font-bold text-[var(--color-on-surface)]">
-                      Gênero
-                    </label>
-                    <select className="w-full px-3 py-2 border border-[var(--color-outline-variant)] rounded-lg font-[var(--font-family-base)] focus:border-[var(--color-primary)] focus:ring-1 focus:ring-primary focus:outline-none bg-[var(--color-surface)]">
-                      <option>Selecione...</option>
-                      <option>Ficção científica</option>
-                      <option>História</option>
-                      <option>Design</option>
-                    </select>
-                  </div>
+    
                   <div className="space-y-1">
                     <label className="font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] font-bold text-[var(--color-on-surface)]">
                       Ano
@@ -505,26 +353,6 @@ function Catalogo() {
                       className="w-full px-3 py-2 border border-[var(--color-outline-variant)] rounded-lg font-[var(--font-family-base)] focus:border-[var(--color-primary)] focus:ring-1 focus:ring-primary focus:outline-none"
                       placeholder="YYYY"
                       type="number"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Physical Details */}
-              <div className="space-y-4">
-                <h4 className="font-[var(--font-family-base)] text-[length:var(--font-size-title-lg)] border-b border-[var(--color-outline-variant)] pb-2">
-                  Acervo
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] font-bold text-[var(--color-on-surface)]">
-                      Quantidade de exemplares
-                    </label>
-                    <input
-                      className="w-full px-3 py-2 border border-[var(--color-outline-variant)] rounded-lg font-[var(--font-family-base)] focus:border-[var(--color-primary)] focus:ring-1 focus:ring-primary focus:outline-none"
-                      min="1"
-                      type="number"
-                      defaultValue="1"
                     />
                   </div>
                 </div>

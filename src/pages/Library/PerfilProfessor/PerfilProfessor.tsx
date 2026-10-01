@@ -11,34 +11,6 @@ interface Professor {
   departamento: string;
   matricula: string;
   email: string;
-  bio: string;
-  areas: string[];
-}
-
-interface Disciplina {
-  codigo: string;
-  nome: string;
-  turma: string;
-  alunos: string;
-  livros: string;
-  cor: "blue" | "purple" | "orange";
-}
-
-interface Livro {
-  titulo: string;
-  autor: string;
-  turma: string;
-  copias: string;
-  status: string;
-  statusTipo: "disponivel" | "fila";
-  imagem: string;
-}
-
-interface Emprestimo {
-  titulo: string;
-  autor: string;
-  prazo: string;
-  data: string;
 }
 
 
@@ -56,111 +28,8 @@ const professorInicial: Professor = {
 
   matricula: "PROF-8842",
 
-  email: "marcos.silveira@orbi.edu.br",
-
-  bio:
-    "Pesquisador em Modernismo Brasileiro, Poéticas Visuais e Narrativas Hipertextuais. Coordenador do Grupo de Estudos em Memória Oral e Curador da Coleção Especial de Obras Raras da Biblioteca ORBI.",
-
-  areas: [
-    "Modernismo",
-    "Crítica Literária",
-    "Semiótica",
-  ],
+  email: "marcos.silveira@orbi.edu.br"
 };
-
-
-const disciplinas: Disciplina[] = [
-  {
-    codigo: "LIT-301",
-    nome: "Literatura Brasileira II",
-    turma: "3º Ano A — Ensino Médio",
-    alunos: "38 Alunos matriculados",
-    livros: "6 Livros em ementa",
-    cor: "blue",
-  },
-
-  {
-    codigo: "RED-102",
-    nome: "Teoria da Redação & Argumentação",
-    turma: "1º Ano B — Ensino Médio",
-    alunos: "34 Alunos matriculados",
-    livros: "4 Livros em ementa",
-    cor: "purple",
-  },
-
-  {
-    codigo: "SEM-402",
-    nome: "Seminário de Obras Raras & Arquivo",
-    turma: "Núcleo Avançado de Humanas",
-    alunos: "16 Alunos pesquisadores",
-    livros: "8 Obras raras",
-    cor: "orange",
-  },
-];
-
-
-const livros: Livro[] = [
-  {
-    titulo: "Macunaíma: O Herói Sem Nenhum Caráter",
-    autor: "Mário de Andrade",
-    turma: "Turma: 3º Ano A",
-    copias: "6 cópias",
-    status: "Disponível",
-    statusTipo: "disponivel",
-
-    imagem:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBYOWHo5Owrvt9RKyCiG4Q2OhdOVxFwplizasSiRzosY4685gmdlaPAqcGnVPu3r9ZNPEOm0GZLlhXg_A5Xq1obcJfHteWuReYQLydHUYjCPT2-lA2RygzozCSO_LVkFC4YCGLIJ-e9plIt7xxXvU4MtlpluXjvvQU6lHHocTG2uW1pIfhHycKDrofsGxv3W-yMNQZduqp1cWsvSGMk9cOmU1RH3r9jp-5tDhZ6qFh1J1tLEtENLPZjBw",
-  },
-
-  {
-    titulo: "Dom Casmurro (Edição Crítica)",
-    autor: "Machado de Assis",
-    turma: "Turma: 3º Ano A",
-    copias: "10 cópias",
-    status: "2 em fila",
-    statusTipo: "fila",
-
-    imagem:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBLwqr7WJncWbcUOowk8Ysiz2FnZ90ITjO1QOhZzsLDqhBmRdY0RfzcUd4WxZojYcsIiTTO7V6GEM-VCXmaPxCtdn1pMfaWOW0_kehIX13zCrNiIx9h36iWmyz5QsnPmI2n-3bgMDzk5vz0TZcA96MTWUoxc1ZTpf-vzzyBUcbQUbbFtnhEwGuh_HEoNsOoW0H-bALpz6jkU_8_bEVzvmFfCMm39Xd-cr2OShN9Q3qY2gMg8TKTaZDBlA",
-  },
-
-  {
-    titulo: "Literatura e Sociedade",
-    autor: "Antonio Candido",
-    turma: "Núcleo Avançado",
-    copias: "4 cópias",
-    status: "Disponível",
-    statusTipo: "disponivel",
-
-    imagem:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBa8qd1fDpjbVWj-i-vGdPWiAVw0-2B2AvfbcLx8yYg6wMDTjE57NIve-5ZT9_ftO1BRZp4r43uQpDG6nsierCVSFa1uwR3-5WeeMOElMfn2x8ZOzs4MjJR2udjrtGE9tgRx52uCBbIl_Wo638RCS5EVNsfWIIe8zGsjVOaCP9ECRyQrCJEdkN-E43MHXRkW-n4GfyhN6oIJU8o5f1eQxa1wgOi-JESm4TN40n2yqlgv_4-vbSrQAt2fw",
-  },
-];
-
-
-const emprestimos: Emprestimo[] = [
-  {
-    titulo: "Os Sertões: Edição Anotada",
-    autor: "Euclides da Cunha • Tomo I",
-    prazo: "Devolução em 22 dias",
-    data: "04/02/2025",
-  },
-
-  {
-    titulo: "História Concisa da Literatura Brasileira",
-    autor: "Alfredo Bosi",
-    prazo: "Devolução em 14 dias",
-    data: "28/01/2025",
-  },
-
-  {
-    titulo: "O Banco dos Réus: Linguagem Jurídica",
-    autor: "Estudos Aplicados de Retórica",
-    prazo: "Devolução em 28 dias",
-    data: "10/02/2025",
-  },
-];
-
 
 // ============================================================
 // COMPONENTE DE ÍCONE
@@ -193,76 +62,6 @@ export default function PerfilProfessor() {
 
   const [professor, setProfessor] =
     useState<Professor>(professorInicial);
-
-  const [modalAberto, setModalAberto] =
-    useState(false);
-
-  const [form, setForm] =
-    useState<Professor>(professorInicial);
-
-  const [salvando, setSalvando] =
-    useState(false);
-
-
-  // ----------------------------------------------------------
-  // ABRIR MODAL
-  // ----------------------------------------------------------
-
-  function abrirModal() {
-    setForm(professor);
-    setModalAberto(true);
-  }
-
-
-  // ----------------------------------------------------------
-  // FECHAR MODAL
-  // ----------------------------------------------------------
-
-  function fecharModal() {
-    if (salvando) return;
-
-    setModalAberto(false);
-  }
-
-
-  // ----------------------------------------------------------
-  // ALTERAR CAMPO
-  // ----------------------------------------------------------
-
-  function alterarCampo(
-    campo: keyof Professor,
-    valor: string
-  ) {
-    setForm((anterior) => ({
-      ...anterior,
-      [campo]: valor,
-    }));
-  }
-
-
-  // ----------------------------------------------------------
-  // SALVAR PERFIL
-  // ----------------------------------------------------------
-
-  function salvarPerfil(
-    event: React.FormEvent<HTMLFormElement>
-  ) {
-
-    event.preventDefault();
-
-    setSalvando(true);
-
-    setTimeout(() => {
-
-      setProfessor(form);
-
-      setSalvando(false);
-
-      setModalAberto(false);
-
-    }, 500);
-  }
-
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
@@ -660,19 +459,7 @@ export default function PerfilProfessor() {
                       </h1>
 
 
-                      <span className="
-                        rounded-full
-                        bg-blue-50
-                        px-2.5
-                        py-1
-                        text-xs
-                        font-semibold
-                        uppercase
-                        tracking-wide
-                        text-blue-700
-                      ">
-                        Docência Superior
-                      </span>
+                     z
 
                     </div>
 
@@ -787,35 +574,6 @@ export default function PerfilProfessor() {
                   gap-2
                 ">
 
-                  <button
-                    type="button"
-                    onClick={abrirModal}
-                    className="
-                      flex
-                      items-center
-                      gap-2
-                      rounded-lg
-                      bg-blue-600
-                      px-4
-                      py-2.5
-                      text-sm
-                      font-semibold
-                      text-white
-                      shadow-sm
-                      transition
-                      hover:bg-blue-700
-                      active:scale-95
-                    "
-                  >
-
-                    <Icon className="text-[18px]">
-                      edit
-                    </Icon>
-
-                    Editar Perfil
-
-                  </button>
-
 
                   <button
                     type="button"
@@ -869,16 +627,6 @@ export default function PerfilProfessor() {
               md:justify-between
             ">
 
-              <p className="
-                max-w-3xl
-                text-sm
-                leading-relaxed
-                text-slate-600
-              ">
-                {professor.bio}
-              </p>
-
-
               <div className="
                 flex
                 flex-wrap
@@ -897,7 +645,7 @@ export default function PerfilProfessor() {
                 </span>
 
 
-                {professor.areas.map((area) => (
+                {/* {professor.areas.map((area) => (
 
                   <span
                     key={area}
@@ -917,7 +665,7 @@ export default function PerfilProfessor() {
                     {area}
                   </span>
 
-                ))}
+                ))} */}
 
               </div>
 
@@ -1018,21 +766,6 @@ export default function PerfilProfessor() {
                   quantidade="4 Turmas"
                   icone="group"
                 />
-
-
-                <div className="space-y-3">
-
-                  {disciplinas.map((disciplina) => (
-
-                    <DisciplinaCard
-                      key={disciplina.codigo}
-                      disciplina={disciplina}
-                    />
-
-                  ))}
-
-                </div>
-
               </section>
 
 
@@ -1135,15 +868,6 @@ export default function PerfilProfessor() {
                   sm:grid-cols-3
                 ">
 
-                  {livros.map((livro) => (
-
-                    <LivroCard
-                      key={livro.titulo}
-                      livro={livro}
-                    />
-
-                  ))}
-
                 </div>
 
               </section>
@@ -1244,21 +968,6 @@ export default function PerfilProfessor() {
                   </span>
 
                 </div>
-
-
-                <div className="space-y-3">
-
-                  {emprestimos.map((emprestimo) => (
-
-                    <EmprestimoCard
-                      key={emprestimo.titulo}
-                      emprestimo={emprestimo}
-                    />
-
-                  ))}
-
-                </div>
-
 
                 <div className="
                   mt-4
@@ -1450,301 +1159,6 @@ export default function PerfilProfessor() {
       {/* =====================================================
           MODAL DE EDIÇÃO
       ====================================================== */}
-
-      {modalAberto && (
-
-        <div
-          className="
-            fixed
-            inset-0
-            z-50
-            flex
-            items-center
-            justify-center
-            bg-slate-900/50
-            p-4
-            backdrop-blur-sm
-          "
-          onMouseDown={(event) => {
-
-            if (
-              event.target === event.currentTarget &&
-              !salvando
-            ) {
-              fecharModal();
-            }
-
-          }}
-        >
-
-          <div className="
-            max-h-[90vh]
-            w-full
-            max-w-2xl
-            overflow-y-auto
-            rounded-2xl
-            bg-white
-            shadow-2xl
-          ">
-
-
-            {/* HEADER MODAL */}
-
-            <div className="
-              flex
-              items-center
-              justify-between
-              border-b
-              border-slate-200
-              bg-slate-50
-              px-6
-              py-4
-            ">
-
-              <div className="
-                flex
-                items-center
-                gap-2.5
-              ">
-
-                <Icon className="
-                  text-[21px]
-                  text-blue-600
-                ">
-                  edit
-                </Icon>
-
-                <h3 className="
-                  text-lg
-                  font-semibold
-                  text-slate-900
-                ">
-                  Editar Perfil do Docente
-                </h3>
-
-              </div>
-
-
-              <button
-                type="button"
-                onClick={fecharModal}
-                disabled={salvando}
-                className="
-                  rounded-lg
-                  p-1.5
-                  text-slate-400
-                  transition
-                  hover:bg-slate-200
-                  hover:text-slate-700
-                  disabled:cursor-not-allowed
-                  disabled:opacity-50
-                "
-              >
-
-                <Icon className="text-[21px]">
-                  close
-                </Icon>
-
-              </button>
-
-            </div>
-
-
-            {/* FORMULÁRIO */}
-
-            <form
-              onSubmit={salvarPerfil}
-              className="space-y-5 p-6"
-            >
-
-
-              {/* NOME */}
-
-              <Campo
-                label="Nome Completo com Titulação"
-                value={form.nome}
-                onChange={(valor) =>
-                  alterarCampo("nome", valor)
-                }
-              />
-
-
-              {/* CARGO / DEPARTAMENTO */}
-
-              <div className="
-                grid
-                grid-cols-1
-                gap-4
-                sm:grid-cols-2
-              ">
-
-                <Campo
-                  label="Cargo / Titulação"
-                  value={form.cargo}
-                  onChange={(valor) =>
-                    alterarCampo("cargo", valor)
-                  }
-                />
-
-                <Campo
-                  label="Departamento"
-                  value={form.departamento}
-                  onChange={(valor) =>
-                    alterarCampo("departamento", valor)
-                  }
-                />
-
-              </div>
-
-
-              {/* MATRÍCULA / EMAIL */}
-
-              <div className="
-                grid
-                grid-cols-1
-                gap-4
-                sm:grid-cols-2
-              ">
-
-                <Campo
-                  label="Matrícula"
-                  value={form.matricula}
-                  onChange={(valor) =>
-                    alterarCampo("matricula", valor)
-                  }
-                />
-
-                <Campo
-                  label="E-mail institucional"
-                  value={form.email}
-                  onChange={(valor) =>
-                    alterarCampo("email", valor)
-                  }
-                />
-
-              </div>
-
-
-              {/* BIO */}
-
-              <div>
-
-                <label className="
-                  mb-1.5
-                  block
-                  text-xs
-                  font-semibold
-                  text-slate-600
-                ">
-                  Biografia Acadêmica & Interesses
-                </label>
-
-
-                <textarea
-                  rows={4}
-                  value={form.bio}
-                  onChange={(event) =>
-                    alterarCampo(
-                      "bio",
-                      event.target.value
-                    )
-                  }
-                  className="
-                    w-full
-                    resize-none
-                    rounded-lg
-                    border
-                    border-slate-300
-                    bg-white
-                    px-3.5
-                    py-2.5
-                    text-sm
-                    text-slate-800
-                    outline-none
-                    transition
-                    focus:border-blue-500
-                    focus:ring-2
-                    focus:ring-blue-100
-                  "
-                />
-
-              </div>
-
-
-              {/* BOTÕES */}
-
-              <div className="
-                flex
-                items-center
-                justify-end
-                gap-3
-                border-t
-                border-slate-200
-                pt-4
-              ">
-
-                <button
-                  type="button"
-                  onClick={fecharModal}
-                  disabled={salvando}
-                  className="
-                    rounded-lg
-                    px-4
-                    py-2.5
-                    text-sm
-                    font-medium
-                    text-slate-500
-                    transition
-                    hover:bg-slate-100
-                    disabled:cursor-not-allowed
-                    disabled:opacity-50
-                  "
-                >
-                  Cancelar
-                </button>
-
-
-                <button
-                  type="submit"
-                  disabled={salvando}
-                  className="
-                    flex
-                    items-center
-                    gap-2
-                    rounded-lg
-                    bg-blue-600
-                    px-5
-                    py-2.5
-                    text-sm
-                    font-semibold
-                    text-white
-                    transition
-                    hover:bg-blue-700
-                    disabled:cursor-not-allowed
-                    disabled:opacity-70
-                  "
-                >
-
-                  <Icon className="text-[18px]">
-                    {salvando ? "sync" : "save"}
-                  </Icon>
-
-                  {salvando
-                    ? "Salvando..."
-                    : "Salvar Alterações"}
-
-                </button>
-
-              </div>
-
-            </form>
-
-          </div>
-
-        </div>
-
-      )}
-
     </div>
   );
 }
@@ -1959,381 +1373,19 @@ function SectionHeader({
 
 // ============================================================
 // CARD DE DISCIPLINA
-// ============================================================
-
-interface DisciplinaCardProps {
-  disciplina: Disciplina;
-}
-
-function DisciplinaCard({
-  disciplina,
-}: DisciplinaCardProps) {
-
-  const cores = {
-
-    blue: "bg-blue-600 text-white",
-
-    purple: "bg-violet-100 text-violet-700",
-
-    orange: "bg-orange-500 text-white",
-
-  };
-
-
-  return (
-    <div className="
-      flex
-      flex-col
-      gap-4
-      rounded-xl
-      border
-      border-slate-100
-      bg-slate-50
-      p-4
-      transition
-      hover:border-blue-100
-      hover:bg-blue-50/40
-      sm:flex-row
-      sm:items-center
-      sm:justify-between
-    ">
-
-
-      <div className="space-y-1">
-
-        <div className="
-          flex
-          items-center
-          gap-2
-        ">
-
-          <span className={`
-            rounded
-            px-2
-            py-0.5
-            text-xs
-            font-semibold
-            ${cores[disciplina.cor]}
-          `}>
-            {disciplina.codigo}
-          </span>
-
-
-          <h3 className="
-            text-base
-            font-semibold
-            text-slate-900
-          ">
-            {disciplina.nome}
-          </h3>
-
-        </div>
-
-
-        <p className="
-          flex
-          flex-wrap
-          items-center
-          gap-2
-          text-xs
-          text-slate-500
-        ">
-
-          <span>
-            {disciplina.turma}
-          </span>
-
-          <span>
-            •
-          </span>
-
-          <span className="
-            font-medium
-            text-slate-600
-          ">
-            {disciplina.alunos}
-          </span>
-
-        </p>
-
-      </div>
-
-
-      <div className="
-        flex
-        items-center
-        gap-2
-        self-end
-        sm:self-center
-      ">
-
-        <span className="
-          rounded-md
-          bg-white
-          px-2.5
-          py-1
-          text-xs
-          text-slate-500
-          shadow-sm
-          ring-1
-          ring-slate-200
-        ">
-          {disciplina.livros}
-        </span>
-
-
-        <button
-          type="button"
-          className="
-            rounded-lg
-            p-1.5
-            text-blue-600
-            transition
-            hover:bg-blue-100
-          "
-        >
-
-          <Icon className="text-[20px]">
-            chevron_right
-          </Icon>
-
-        </button>
-
-      </div>
-
-    </div>
-  );
-}
+// ===========================================================
 
 
 // ============================================================
 // CARD DE LIVRO
 // ============================================================
 
-interface LivroCardProps {
-  livro: Livro;
-}
 
-function LivroCard({
-  livro,
-}: LivroCardProps) {
-
-  return (
-    <div className="
-      group
-      overflow-hidden
-      rounded-xl
-      border
-      border-slate-200
-      bg-slate-50
-      p-3
-      transition
-      hover:-translate-y-0.5
-      hover:shadow-md
-    ">
-
-
-      {/* IMAGEM */}
-
-      <div className="
-        relative
-        mb-3
-        h-44
-        w-full
-        overflow-hidden
-        rounded-lg
-        bg-slate-200
-      ">
-
-        <img
-          src={livro.imagem}
-          alt={livro.titulo}
-          className="
-            h-full
-            w-full
-            object-cover
-            transition
-            duration-300
-            group-hover:scale-105
-          "
-        />
-
-
-        <span className={`
-          absolute
-          right-2
-          top-2
-          rounded
-          px-2
-          py-0.5
-          text-xs
-          font-semibold
-          backdrop-blur
-          ${
-            livro.statusTipo === "disponivel"
-              ? "bg-white/90 text-emerald-600"
-              : "bg-white/90 text-orange-600"
-          }
-        `}>
-          {livro.status}
-        </span>
-
-      </div>
-
-
-      {/* INFORMAÇÕES */}
-
-      <h4 className="
-        line-clamp-1
-        text-sm
-        font-semibold
-        text-slate-900
-      ">
-        {livro.titulo}
-      </h4>
-
-
-      <p className="
-        text-xs
-        text-slate-500
-      ">
-        {livro.autor}
-      </p>
-
-
-      <div className="
-        mt-2
-        flex
-        items-center
-        justify-between
-        border-t
-        border-slate-200
-        pt-2
-        text-xs
-      ">
-
-        <span className="text-blue-600">
-          {livro.turma}
-        </span>
-
-        <span className="text-slate-500">
-          {livro.copias}
-        </span>
-
-      </div>
-
-    </div>
-  );
-}
 
 
 // ============================================================
 // CARD DE EMPRÉSTIMO
 // ============================================================
-
-interface EmprestimoCardProps {
-  emprestimo: Emprestimo;
-}
-
-function EmprestimoCard({
-  emprestimo,
-}: EmprestimoCardProps) {
-
-  return (
-    <div className="
-      rounded-xl
-      border
-      border-slate-100
-      bg-slate-50
-      p-4
-    ">
-
-      <div className="
-        flex
-        items-start
-        justify-between
-        gap-3
-      ">
-
-        <div>
-
-          <h4 className="
-            text-sm
-            font-semibold
-            text-slate-900
-          ">
-            {emprestimo.titulo}
-          </h4>
-
-          <p className="
-            text-xs
-            text-slate-500
-          ">
-            {emprestimo.autor}
-          </p>
-
-        </div>
-
-
-        <span className="
-          whitespace-nowrap
-          rounded
-          bg-blue-50
-          px-2
-          py-0.5
-          text-xs
-          font-medium
-          text-blue-600
-        ">
-          {emprestimo.prazo}
-        </span>
-
-      </div>
-
-
-      <div className="
-        mt-3
-        flex
-        items-center
-        justify-between
-        border-t
-        border-slate-200
-        pt-2
-        text-xs
-        text-slate-500
-      ">
-
-        <span>
-          Retirado em: {emprestimo.data}
-        </span>
-
-
-        <button
-          type="button"
-          className="
-            flex
-            items-center
-            gap-1
-            font-medium
-            text-blue-600
-            transition
-            hover:text-blue-700
-          "
-        >
-
-          <Icon className="text-[15px]">
-            refresh
-          </Icon>
-
-          Renovar
-
-        </button>
-
-      </div>
-
-    </div>
-  );
-}
 
 
 // ============================================================
