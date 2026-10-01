@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 function Catalogo() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isActionsOpen, setIsActionsOpen] = useState(false);
 
   return (
     <div className="bg-[var(--color-background)] text-[var(--color-on-background)] font-[var(--font-family-base)] min-h-screen flex">
@@ -134,7 +135,7 @@ function Catalogo() {
               <table className="w-full text-left border-collapse min-w-[800px]">
                 <thead>
                   <tr className="bg-[var(--color-surface-container)] text-[var(--color-on-surface-variant)] font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] uppercase tracking-wider border-b border-[var(--color-outline-variant)]">
-                    <th className="py-3 font-medium w-2 text-center">
+                    <th className="w-10 py-3 px-2 font-medium text-center">
                       <input
                         className="rounded border-[var(--color-outline-variant)] text-[var(--color-primary)] focus:ring-primary m-0"
                         type="checkbox"
@@ -143,8 +144,7 @@ function Catalogo() {
                     <th className="py-3 px-4 font-medium">Detalhes do livro</th>
                     <th className="py-3 px-4 font-medium">ISBN</th>
                     <th className="py-3 px-4 font-medium">Categoria / gênero</th>
-                    <th className="py-3 px-4 font-medium">Localização</th>
-                    <th className="py-3 px-4 font-medium">Status</th>
+                                        <th className="py-3 px-4 font-medium">Status</th>
                     <th className="py-3 px-4 font-medium text-right">
                       Ações
                     </th>
@@ -155,7 +155,7 @@ function Catalogo() {
 
                   {/* Row 1 */}
                 <tr className="hover:bg-[var(--color-surface-container-low)] transition-colors group">
-                    <td className="py-3 px-4 text-center">
+                    <td className="w-10 py-3 px-2 text-center">
                       <input
                         className="rounded border-[var(--color-outline-variant)] text-[var(--color-primary)] focus:ring-primary"
                         type="checkbox"
@@ -189,40 +189,54 @@ function Catalogo() {
                         Ficção
                       </p>
                     </td>
-                    <td className="py-3 px-4 font-[var(--font-family-base)] text-[length:var(--font-size-body-md)] text-[var(--color-on-surface)]">
-                      F1 - Estante 2
-                    </td>
                     <td className="py-3 px-4">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] font-medium bg-[var(--color-surface-container-highest)] text-[var(--color-on-surface-variant)]">
                         Emprestado
                       </span>
                     </td>
                     <td className="py-3 px-4 text-right">
-                      <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="relative inline-block text-left">
                         <button
-                          className="p-1.5 text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)] hover:bg-[var(--color-surface-container)] rounded-md transition-colors"
-                          title="Generate QR"
+                          type="button"
+                          onClick={() => setIsActionsOpen((open) => !open)}
+                          aria-label="Abrir ações do livro"
+                          aria-expanded={isActionsOpen}
+                          className="inline-flex items-center justify-center gap-1 rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-on-surface-variant)] transition-colors hover:bg-[var(--color-surface-container-low)] hover:text-[var(--color-on-surface)]"
                         >
-                          <span className="material-symbols-outlined text-[18px]">
-                            menu_menu_book
+                          <span className="material-symbols-outlined text-[18px]">more_horiz</span>
+                          <span>Ações</span>
+                          <span className="material-symbols-outlined text-[16px]">
+                            {isActionsOpen ? "expand_less" : "expand_more"}
                           </span>
                         </button>
-                        <button
-                          className="p-1.5 text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)] hover:bg-[var(--color-surface-container)] rounded-md transition-colors"
-                          title="Edit"
-                        >
-                          <span className="material-symbols-outlined text-[18px]">
-                            settings
-                          </span>
-                        </button>
-                        <button
-                          className="p-1.5 text-[var(--color-on-surface-variant)] hover:text-[var(--color-error)] hover:bg-[var(--color-error-container)] rounded-md transition-colors"
-                          title="Delete"
-                        >
-                          <span className="material-symbols-outlined text-[18px]">
-                            logout
-                          </span>
-                        </button>
+                        {isActionsOpen && (
+                          <div className="absolute right-0 z-20 mt-2 w-44 origin-top-right rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface-container-lowest)] py-1 text-left shadow-lg">
+                            <button
+                              type="button"
+                              onClick={() => setIsActionsOpen(false)}
+                              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-[var(--color-on-surface)] transition-colors hover:bg-[var(--color-surface-container-low)]"
+                            >
+                              <span className="material-symbols-outlined text-[18px]">qr_code_2</span>
+                              Gerar QR Code
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setIsActionsOpen(false)}
+                              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-[var(--color-on-surface)] transition-colors hover:bg-[var(--color-surface-container-low)]"
+                            >
+                              <span className="material-symbols-outlined text-[18px]">edit</span>
+                              Editar livro
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setIsActionsOpen(false)}
+                              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-[var(--color-error)] transition-colors hover:bg-[var(--color-error-container)]"
+                            >
+                              <span className="material-symbols-outlined text-[18px]">delete</span>
+                              Excluir livro
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </td>
                 </tr>
