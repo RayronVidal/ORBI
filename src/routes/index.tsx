@@ -3,6 +3,8 @@ import AcesseSuaConta from "../pages/Auth/AcesseSuaConta/AcesseSuaConta";
 import Inicio from "../pages/Library/Inicio/Inicio";
 import Layout from "../layouts/Layout";
 import Emprestimos from "../pages/Library/GestaoEmprestimos/Emprestimos";
+import Catalogo from "../pages/Library/Catalogo/Catalogo";
+import PerfilProfessor from "../pages/Library/PerfilProfessor/PerfilProfessor";
 
 export function Rotas(){
     return (
@@ -11,8 +13,11 @@ export function Rotas(){
                 <Route path="/" element={<AcesseSuaConta />} />
 
                 <Route element={<Layout />}>
-                    <Route path="/inicio" element={<Inicio />} />
+                    <Route path="/dashboard" element={<Inicio />} />
                     <Route path="/emprestimos" element={<Emprestimos />} />
+                    <Route path="/catalogo" element={<Catalogo/> } />
+                    <Route path="/perfil" element={<PerfilProfessor/> } />
+
                 </Route>
             </Routes>
         </BrowserRouter>

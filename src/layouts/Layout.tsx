@@ -3,10 +3,10 @@ import MenuLateral from "../components/MenuLateral/MenuLateral";
 
 function Layout() {
     return (
-        <div className="flex bg-slate-100 min-h-screen w-full">
+        <div className="flex min-h-screen w-full bg-slate-100">
             <MenuLateral />
-            
-            <main className="flex-1 p-6 ml-[280px]">
+
+            <main className="min-w-0 flex-1 p-4 pt-20 md:p-6 md:pt-6">
                 <Outlet />
             </main>
         </div>

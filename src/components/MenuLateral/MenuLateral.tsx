@@ -1,215 +1,153 @@
-import Logo1 from '../../assets/imagens/Logo1.png';
+import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import Logo1 from '../../assets/imagens/Logo1.png';
+
+const linksPrincipais = [
+  { to: '/dashboard', icon: 'dashboard', label: 'Painel' },
+  { to: '/catalogo', icon: 'menu_book', label: 'Catálogo' },
+  { to: '/emprestimos', icon: 'bookmark_add', label: 'Empréstimos' },
+  { to: '/devolucoes', icon: 'assignment_return', label: 'Devoluções' },
+  { to: '/usuarios', icon: 'group', label: 'Alunos' },
+];
+
+const linksInferiores = [
+  { to: '/ajuda', icon: 'help', label: 'Ajuda' },
+  { to: '/perfil', icon: 'account_circle', label: 'Perfil' },
+];
 
 function MenuLateral() {
+  const [recolhido, setRecolhido] = useState(false);
+  const [menuMobileAberto, setMenuMobileAberto] = useState(false);
+
+  useEffect(() => {
+    const fecharComEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMenuMobileAberto(false);
+    };
+
+    window.addEventListener('keydown', fecharComEscape);
+    return () => window.removeEventListener('keydown', fecharComEscape);
+  }, []);
+
+  const linkClass = ({ isActive }: { isActive: boolean }) =>
+    `flex items-center rounded-lg py-3 transition-all duration-200 ${recolhido ? 'justify-center px-2' : 'gap-3 px-4'} ${
+      isActive
+        ? 'text-[var(--color-primary)] bg-secondary-container/50 border-l-4 border-[var(--color-primary)] font-bold'
+        : 'text-on-surface-variant hover:bg-surface-container-highest hover:text-[var(--color-primary-container)]'
+    }`;
+
+  const renderLink = (link: (typeof linksPrincipais)[number]) => (
+    <NavLink
+      key={link.to}
+      to={link.to}
+      onClick={() => setMenuMobileAberto(false)}
+      title={recolhido ? link.label : undefined}
+      aria-label={link.label}
+      className={linkClass}
+    >
+      <span className="material-symbols-outlined shrink-0" aria-hidden="true">
+        {link.icon}
+      </span>
+      <span className={`font-label-md text-label-md whitespace-nowrap ${recolhido ? 'md:hidden' : ''}`}>{link.label}</span>
+    </NavLink>
+  );
+
   return (
-    <nav className="fixed left-0 top-0 h-full w-[280px] bg-[var(--color-background)] border-r border-outline-variant flex flex-col py-6 hidden md:flex z-50">
+    <>
+      {/* Cabeçalho fixo exibido somente em telas pequenas. */}
+      <header className="fixed inset-x-0 top-0 z-[60] flex h-16 items-center gap-3 border-b border-outline-variant bg-[var(--color-background)] px-4 md:hidden">
+        <button
+          type="button"
+          onClick={() => setMenuMobileAberto(true)}
+          className="flex h-10 w-10 items-center justify-center rounded-lg text-[var(--color-primary)] transition-colors hover:bg-surface-container-highest"
+          aria-label="Abrir menu de navegação"
+          aria-expanded={menuMobileAberto}
+        >
+          <span className="material-symbols-outlined" aria-hidden="true">menu</span>
+        </button>
+        <img src={Logo1} alt="Logo ORBI" className="h-9 w-9 object-contain" />
+        <div className="leading-tight">
+          <h1 className="font-bold text-[var(--color-primary)]">ORBI</h1>
+          <p className="text-xs text-on-surface-variant">sistema bibliotecário</p>
+        </div>
+      </header>
 
-      {/* LOGO */}
-      <div className="px-gutter mb-8 flex items-center gap-2">
-        <div className="w-20 h-10 rounded-lg bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-lg">
-          <img
-            src={Logo1}
-            alt="Logo ORBI"
-            className="p-0 m-0 w-20 h-20"
-          />
+      {/* Fundo escurecido do menu mobile. */}
+      {menuMobileAberto && (
+        <button
+          type="button"
+          aria-label="Fechar menu de navegação"
+          onClick={() => setMenuMobileAberto(false)}
+          className="fixed inset-0 z-[70] bg-black/40 md:hidden"
+        />
+      )}
+
+      <nav
+        aria-label="Navegação principal"
+        className={`fixed left-0 top-0 z-[80] flex h-dvh shrink-0 flex-col border-r border-outline-variant bg-[var(--color-background)] py-6 transition-[width,transform] duration-300 ease-in-out
+          w-[280px]
+          ${menuMobileAberto ? 'translate-x-0' : '-translate-x-full'}
+          md:sticky md:top-0 md:left-auto md:z-auto md:translate-x-0 md:self-start ${recolhido ? 'md:w-20' : 'md:w-[280px]'}`}
+      >
+        {/* Cabeçalho e controles do menu. */}
+        <div className={`mb-8 flex min-h-12 items-center ${recolhido ? 'justify-center px-2' : 'justify-between px-5'}`}>
+          <div className={`flex min-w-0 items-center gap-3 ${recolhido ? 'md:hidden' : ''}`}>
+            <img src={Logo1} alt="Logo ORBI" className="h-15 w-15 shrink-0 object-contain" />
+            <div className="min-w-0">
+              <h1 className="font-bold text-[var(--color-primary)]">ORBI</h1>
+              <p className="whitespace-nowrap text-xs text-on-surface-variant">sistema bibliotecário</p>
+            </div>
+          </div>
+
+          {recolhido && (
+            <img src={Logo1} alt="Logo ORBI" className="hidden h-10 w-10 object-contain md:block" />
+          )}
+
+          <button
+            type="button"
+            onClick={() => setMenuMobileAberto(false)}
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-highest md:hidden"
+            aria-label="Fechar menu"
+          >
+            <span className="material-symbols-outlined" aria-hidden="true">close</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setRecolhido((valor) => !valor)}
+            className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-lg text-on-surface-variant transition-colors hover:bg-surface-container-highest md:flex"
+            aria-label={recolhido ? 'Expandir menu lateral' : 'Recolher menu lateral'}
+            title={recolhido ? 'Expandir menu' : 'Recolher menu'}
+          >
+            <span className="material-symbols-outlined rounded-full p-1 text-[var(--color-on-secondary-container)] hover:bg-[var(--color-secondary-container)]" aria-hidden="true">
+              {recolhido ? 'left_panel_open' : 'left_panel_close'}
+            </span>
+          </button>
         </div>
 
-        <div>
-          <h1 className="text-[var(--color-primary)] font-headline-md text-headline-md font-bold">
-            ORBI
-          </h1>
-
-          <p className="font-label-md text-label-md text-on-surface-variant">
-            sistema bibliotecário
-          </p>
+        {/* Navegação principal. */}
+        <div className={`flex-1 space-y-1 overflow-y-auto ${recolhido ? 'px-2' : 'px-4'}`}>
+          {linksPrincipais.map(renderLink)}
         </div>
-      </div>
 
-      {/* MENU PRINCIPAL */}
-      <div className="flex-1 overflow-y-auto px-4 space-y-1">
+        {/* Navegação inferior. */}
+        <div className={`mt-auto space-y-1 border-t border-outline-variant pt-4 ${recolhido ? 'px-2' : 'px-4'}`}>
+          {linksInferiores.map(renderLink)}
 
-        {/* PAINEL */}
-        <NavLink
-          to="/inicio"
-          className={({ isActive }) =>
-            `flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-              isActive
-                ? "text-[var(--color-primary)] bg-secondary-container/50 border-l-4 border-[var(--color-primary)] font-bold"
-                : "text-on-surface-variant hover:bg-surface-container-highest hover:text-[var(--color-primary-container)]"
-            }`
-          }
-        >
-          <span className="material-symbols-outlined">
-            dashboard
-          </span>
-
-          <span className="font-label-md text-label-md">
-            Painel
-          </span>
-        </NavLink>
-
-        {/* CATÁLOGO */}
-        <NavLink
-          to="/catalogo"
-          className={({ isActive }) =>
-            `flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-              isActive
-                ? "text-[var(--color-primary)] bg-secondary-container/50 border-l-4 border-[var(--color-primary)] font-bold"
-                : "text-on-surface-variant hover:bg-surface-container-highest hover:text-[var(--color-primary-container)]"
-            }`
-          }
-        >
-          <span className="material-symbols-outlined">
-            menu_book
-          </span>
-
-          <span className="font-label-md text-label-md">
-            Catálogo
-          </span>
-        </NavLink>
-
-        {/* EMPRÉSTIMOS */}
-        <NavLink
-          to="/emprestimos"
-          className={({ isActive }) =>
-            `flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-              isActive
-                ? "text-[var(--color-primary)] bg-secondary-container/50 border-l-4 border-[var(--color-primary)] font-bold"
-                : "text-on-surface-variant hover:bg-surface-container-highest hover:text-[var(--color-primary-container)]"
-            }`
-          }
-        >
-          <span className="material-symbols-outlined">
-            bookmark_add
-          </span>
-
-          <span className="font-label-md text-label-md">
-            Empréstimos
-          </span>
-        </NavLink>
-
-        {/* DEVOLUÇÕES */}
-        <NavLink
-          to="/devolucoes"
-          className={({ isActive }) =>
-            `flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-              isActive
-                ? "text-[var(--color-primary)] bg-secondary-container/50 border-l-4 border-[var(--color-primary)] font-bold"
-                : "text-on-surface-variant hover:bg-surface-container-highest hover:text-[var(--color-primary-container)]"
-            }`
-          }
-        >
-          <span className="material-symbols-outlined">
-            assignment_return
-          </span>
-
-          <span className="font-label-md text-label-md">
-            Devoluções
-          </span>
-        </NavLink>
-
-        {/* USUÁRIOS */}
-        <NavLink
-          to="/usuarios"
-          className={({ isActive }) =>
-            `flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-              isActive
-                ? "text-[var(--color-primary)] bg-secondary-container/50 border-l-4 border-[var(--color-primary)] font-bold"
-                : "text-on-surface-variant hover:bg-surface-container-highest hover:text-[var(--color-primary-container)]"
-            }`
-          }
-        >
-          <span className="material-symbols-outlined">
-            group
-          </span>
-
-          <span className="font-label-md text-label-md">
-            Alunos
-          </span>
-        </NavLink>
-
-        {/* CONFIGURAÇÕES */}
-        <NavLink
-          to="/configuracoes"
-          className={({ isActive }) =>
-            `flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-              isActive
-                ? "text-[var(--color-primary)] bg-secondary-container/50 border-l-4 border-[var(--color-primary)] font-bold"
-                : "text-on-surface-variant hover:bg-surface-container-highest hover:text-[var(--color-primary-container)]"
-            }`
-          }
-        >
-          <span className="material-symbols-outlined">
-            settings
-          </span>
-
-          <span className="font-label-md text-label-md">
-            Configurações
-          </span>
-        </NavLink>
-
-      </div>
-
-      {/* MENU INFERIOR */}
-      <div className="px-4 mt-auto pt-4 border-t border-outline-variant space-y-1">
-
-        {/* AJUDA */}
-        <NavLink
-          to="/ajuda"
-          className={({ isActive }) =>
-            `flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-              isActive
-                ? "text-[var(--color-primary)] bg-secondary-container/50 border-l-4 border-[var(--color-primary)] font-bold"
-                : "text-on-surface-variant hover:bg-surface-container-highest hover:text-[var(--color-primary-container)]"
-            }`
-          }
-        >
-          <span className="material-symbols-outlined">
-            help
-          </span>
-
-          <span className="font-label-md text-label-md">
-            Ajuda
-          </span>
-        </NavLink>
-
-        {/* PERFIL */}
-        <NavLink
-          to="/perfil"
-          className={({ isActive }) =>
-            `flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-              isActive
-                ? "text-[var(--color-primary)] bg-secondary-container/50 border-l-4 border-[var(--color-primary)] font-bold"
-                : "text-on-surface-variant hover:bg-surface-container-highest hover:text-[var(--color-primary-container)]"
-            }`
-          }
-        >
-          <span className="material-symbols-outlined">
-            account_circle
-          </span>
-
-          <span className="font-label-md text-label-md">
-            Perfil
-          </span>
-        </NavLink>
-
-        {/* SAIR */}
-        <a
-          className="text-[var(--color-error)] hover:text-red-500 flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg"
-          href="#"
-        >
-          <span className="material-symbols-outlined">
-            logout
-          </span>
-
-          <span className="font-label-md text-label-md">
-            Sair
-          </span>
-        </a>
-
-      </div>
-    </nav>
+          <button
+            type="button"
+            title={recolhido ? 'Sair' : undefined}
+            onClick={() => {
+              setMenuMobileAberto(false);
+              // A ação de logout pode ser conectada aqui quando a autenticação estiver implementada.
+            }}
+            className={`flex w-full items-center rounded-lg py-3 text-[var(--color-error)] transition-colors hover:bg-surface-container-highest hover:text-red-500 ${recolhido ? 'justify-center px-2' : 'gap-3 px-4'}`}
+          >
+            <span className="material-symbols-outlined shrink-0" aria-hidden="true">logout</span>
+            {!recolhido && <span className="font-label-md text-label-md">Sair</span>}
+          </button>
+        </div>
+      </nav>
+    </>
   );
 }
 
