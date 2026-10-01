@@ -83,10 +83,10 @@ function MenuLateral() {
 
       <nav
         aria-label="Navegação principal"
-        className={`fixed left-0 top-0 z-[80] flex h-dvh flex-col border-r border-outline-variant bg-[var(--color-background)] py-6 transition-[width,transform] duration-300 ease-in-out
+        className={`fixed left-0 top-0 z-[80] flex h-dvh shrink-0 flex-col border-r border-outline-variant bg-[var(--color-background)] py-6 transition-[width,transform] duration-300 ease-in-out
           w-[280px]
           ${menuMobileAberto ? 'translate-x-0' : '-translate-x-full'}
-          md:translate-x-0 ${recolhido ? 'md:w-20' : 'md:w-[280px]'}`}
+          md:relative md:left-auto md:top-auto md:z-auto md:translate-x-0 ${recolhido ? 'md:w-20' : 'md:w-[280px]'}`}
       >
         {/* Cabeçalho e controles do menu. */}
         <div className={`mb-8 flex min-h-12 items-center ${recolhido ? 'justify-center px-2' : 'justify-between px-5'}`}>
@@ -118,7 +118,7 @@ function MenuLateral() {
             aria-label={recolhido ? 'Expandir menu lateral' : 'Recolher menu lateral'}
             title={recolhido ? 'Expandir menu' : 'Recolher menu'}
           >
-            <span className="material-symbols-outlined text-[var(--color-on-secondary-container)] hover:bg-[var(--color-secondary-container)] p-1 rounded-full cursor-pointer" aria-hidden="true">
+            <span className="material-symbols-outlined rounded-full p-1 text-[var(--color-on-secondary-container)] hover:bg-[var(--color-secondary-container)]" aria-hidden="true">
               {recolhido ? 'left_panel_open' : 'left_panel_close'}
             </span>
           </button>
