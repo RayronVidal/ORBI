@@ -415,7 +415,7 @@ function Catalogo() {
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-on-background/50 backdrop-blur-sm"
           id="newBookModal"
         >
-          <div className="bg-[var(--color-surface-container-lowest)] w-full max-w-2xl rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] border border-[var(--color-outline-variant)] flex flex-col max-h-[921px]">
+          <div className="bg-[var(--color-surface-container-lowest)] w-full max-w-2xl rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] border border-[var(--color-outline-variant)] flex flex-col max-h-[521px]">
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-[var(--color-outline-variant)] flex justify-between items-center bg-[var(--color-surface)]">
               <h3 className="font-[var(--font-family-base)] text-[length:var(--font-size-headline-md)] text-[var(--color-on-surface)] font-semibold">
@@ -516,16 +516,6 @@ function Catalogo() {
                   Acervo
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] font-bold text-[var(--color-on-surface)]">
-                      Localização / Shelf
-                    </label>
-                    <input
-                      className="w-full px-3 py-2 border border-[var(--color-outline-variant)] rounded-lg font-[var(--font-family-base)] focus:border-[var(--color-primary)] focus:ring-1 focus:ring-primary focus:outline-none"
-                      placeholder="e.g. A1 - Shelf 2"
-                      type="text"
-                    />
-                  </div>
                   <div className="space-y-1">
                     <label className="font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] font-bold text-[var(--color-on-surface)]">
                       Quantidade de exemplares

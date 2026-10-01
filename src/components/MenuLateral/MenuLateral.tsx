@@ -91,7 +91,7 @@ function MenuLateral() {
         {/* Cabeçalho e controles do menu. */}
         <div className={`mb-8 flex min-h-12 items-center ${recolhido ? 'justify-center px-2' : 'justify-between px-5'}`}>
           <div className={`flex min-w-0 items-center gap-3 ${recolhido ? 'md:hidden' : ''}`}>
-            <img src={Logo1} alt="Logo ORBI" className="h-10 w-10 shrink-0 object-contain" />
+            <img src={Logo1} alt="Logo ORBI" className="h-15 w-15 shrink-0 object-contain" />
             <div className="min-w-0">
               <h1 className="font-bold text-[var(--color-primary)]">ORBI</h1>
               <p className="whitespace-nowrap text-xs text-on-surface-variant">sistema bibliotecário</p>
@@ -118,7 +118,7 @@ function MenuLateral() {
             aria-label={recolhido ? 'Expandir menu lateral' : 'Recolher menu lateral'}
             title={recolhido ? 'Expandir menu' : 'Recolher menu'}
           >
-            <span className="material-symbols-outlined" aria-hidden="true">
+            <span className="material-symbols-outlined text-[var(--color-on-secondary-container)] hover:bg-[var(--color-secondary-container)] p-1 rounded-full cursor-pointer" aria-hidden="true">
               {recolhido ? 'left_panel_open' : 'left_panel_close'}
             </span>
           </button>
