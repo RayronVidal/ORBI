@@ -53,7 +53,7 @@ function MenuLateral() {
 
   return (
     <>
-      {/* Botão hambúrguer: aparece somente em telas pequenas. */}
+      {/* Cabeçalho fixo exibido somente em telas pequenas. */}
       <header className="fixed inset-x-0 top-0 z-[60] flex h-16 items-center gap-3 border-b border-outline-variant bg-[var(--color-background)] px-4 md:hidden">
         <button
           type="button"
@@ -86,7 +86,7 @@ function MenuLateral() {
         className={`fixed left-0 top-0 z-[80] flex h-dvh shrink-0 flex-col border-r border-outline-variant bg-[var(--color-background)] py-6 transition-[width,transform] duration-300 ease-in-out
           w-[280px]
           ${menuMobileAberto ? 'translate-x-0' : '-translate-x-full'}
-          md:relative md:left-auto md:top-auto md:z-auto md:translate-x-0 ${recolhido ? 'md:w-20' : 'md:w-[280px]'}`}
+          md:sticky md:top-0 md:left-auto md:z-auto md:translate-x-0 md:self-start ${recolhido ? 'md:w-20' : 'md:w-[280px]'}`}
       >
         {/* Cabeçalho e controles do menu. */}
         <div className={`mb-8 flex min-h-12 items-center ${recolhido ? 'justify-center px-2' : 'justify-between px-5'}`}>
