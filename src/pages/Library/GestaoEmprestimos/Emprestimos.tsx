@@ -88,6 +88,7 @@ function Emprestimos() {
   const [livro, setLivro] = useState("");
   const [data, setData] = useState("Qualquer período");
   const [busca, setBusca] = useState("");
+  const [acoesAbertas, setAcoesAbertas] = useState<number | null>(null);
 
   const contagemAtivos = emprestimos.filter((item) => item.status === "Ativo").length;
   const contagemAtrasados = emprestimos.filter((item) => item.status === "Atrasado").length;
@@ -170,7 +171,39 @@ function Emprestimos() {
                       <td><div className="date-cell"><span>{loan.first}</span><span>{loan.second}</span></div></td>
                       <td><div className={`date-cell ${item.status === "Atrasado" ? "danger" : ""}`}><span>{due.first}</span><span>{due.second}</span><small>{item.prazo}</small></div></td>
                       <td><span className={`status-pill ${item.status === "Atrasado" ? "overdue" : "active"}`}>{item.status}</span></td>
-                      <td><button className="more-button" aria-label={`Ações para ${item.aluno}`}><Icon name="more" size={20} /> </button></td>
+                      <td>
+                        <div className="loan-actions-menu">
+                          <button
+                            type="button"
+                            className="loan-actions-trigger"
+                            onClick={() => setAcoesAbertas((aberto) => aberto === item.id ? null : item.id)}
+                            aria-label={`Abrir ações do empréstimo de ${item.aluno}`}
+                            aria-expanded={acoesAbertas === item.id}
+                          >
+                            <Icon name="more" size={18} />
+                            <span>Ações</span>
+                            <span className="material-symbols-outlined loan-actions-chevron">
+                              {acoesAbertas === item.id ? "expand_less" : "expand_more"}
+                            </span>
+                          </button>
+                          {acoesAbertas === item.id && (
+                            <div className="loan-actions-dropdown">
+                              <button type="button" onClick={() => setAcoesAbertas(null)}>
+                                <span className="material-symbols-outlined">visibility</span>
+                                Ver detalhes
+                              </button>
+                              <button type="button" onClick={() => setAcoesAbertas(null)}>
+                                <span className="material-symbols-outlined">assignment_turned_in</span>
+                                Registrar devolução
+                              </button>
+                              <button type="button" onClick={() => setAcoesAbertas(null)}>
+                                <span className="material-symbols-outlined">autorenew</span>
+                                Renovar empréstimo
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </td>
                     </tr>                                                  
                   );
                 })}
