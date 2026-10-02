@@ -3,6 +3,7 @@ import React, { useState } from "react";
 function Catalogo() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isActionsOpen, setIsActionsOpen] = useState(false);
+  const [mobileBookExpanded, setMobileBookExpanded] = useState(false);
 
   return (
     <div className="bg-[var(--color-background)] text-[var(--color-on-background)] font-[var(--font-family-base)] min-h-screen flex">
@@ -131,8 +132,8 @@ function Catalogo() {
 
           {/* Data Table Container */}
           <div className="bg-[var(--color-surface-container-lowest)] border border-[var(--color-surface-container-highest)] rounded-xl overflow-hidden shadow-sm flex-1 flex flex-col">
-            <div className="overflow-x-auto flex-1">
-              <table className="w-full text-left border-collapse min-w-[800px]">
+            <div className="hidden md:block overflow-x-auto flex-1">
+              <table className="w-full table-fixed text-left border-collapse">
                 <thead>
                   <tr className="bg-[var(--color-surface-container)] text-[var(--color-on-surface-variant)] font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] uppercase tracking-wider border-b border-[var(--color-outline-variant)]">
                     <th className="w-10 py-3 px-2 font-medium text-center">
@@ -141,11 +142,11 @@ function Catalogo() {
                         type="checkbox"
                       />
                     </th>
-                    <th className="py-3 px-4 font-medium">Detalhes do livro</th>
-                    <th className="py-3 px-4 font-medium">ISBN</th>
-                    <th className="py-3 px-4 font-medium">Categoria</th>
-                                        <th className="py-3 px-4 font-medium">Status</th>
-                    <th className="py-3 px-4 font-medium text-right">
+                    <th className="py-3 px-2 md:px-3 font-medium">Detalhes do livro</th>
+                    <th className="py-3 px-2 md:px-3 font-medium">ISBN</th>
+                    <th className="py-3 px-2 md:px-3 font-medium">Categoria</th>
+                                        <th className="py-3 px-2 md:px-3 font-medium">Status</th>
+                    <th className="py-3 px-2 md:px-3 font-medium text-right">
                       Ações
                     </th>
                   </tr>
@@ -161,7 +162,7 @@ function Catalogo() {
                         type="checkbox"
                       />
                     </td>
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-2 md:px-3">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-14 bg-[var(--color-surface-container-highest)] rounded flex items-center justify-center shrink-0">
                           <span className="material-symbols-outlined text-[var(--color-outline)]">
@@ -178,7 +179,7 @@ function Catalogo() {
                         </div>
                       </div>
                     </td>
-                    <td className="py-3 px-4 font-[var(--font-family-base)] text-[length:var(--font-size-body-md)] text-[var(--color-on-surface)]">
+                    <td className="py-3 px-2 md:px-3 font-[var(--font-family-base)] text-[length:var(--font-size-body-md)] text-[var(--color-on-surface)]">
                       978-0441172719
                     </td>
                     <td className="py-3 px-4">
@@ -235,6 +236,60 @@ function Catalogo() {
 
                 </tbody>
               </table>
+            </div>
+
+            {/* Mobile book card */}
+            <div className="md:hidden p-3">
+              <article className="rounded-xl border border-[var(--color-outline-variant)] bg-[var(--color-surface)] p-4 shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => setMobileBookExpanded((expanded) => !expanded)}
+                  aria-expanded={mobileBookExpanded}
+                  className="flex w-full items-center gap-3 text-left"
+                >
+                  <div className="flex h-14 w-11 shrink-0 items-center justify-center rounded bg-[var(--color-surface-container-highest)]">
+                    <span className="material-symbols-outlined text-[var(--color-outline)]">menu_book</span>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-semibold text-[var(--color-on-surface)]">Dune</p>
+                    <p className="truncate text-sm text-[var(--color-on-surface-variant)]">Frank Herbert</p>
+                    <span className="mt-1 inline-flex rounded-full bg-[var(--color-surface-container-highest)] px-2 py-0.5 text-xs text-[var(--color-on-surface-variant)]">Emprestado</span>
+                  </div>
+                  <span className="material-symbols-outlined text-[var(--color-on-surface-variant)]">
+                    {mobileBookExpanded ? "expand_less" : "expand_more"}
+                  </span>
+                </button>
+                {mobileBookExpanded && (
+                  <div className="mt-4 space-y-3 border-t border-[var(--color-outline-variant)] pt-3 text-sm">
+                    <div><span className="text-[var(--color-on-surface-variant)]">ISBN</span><p className="break-all text-[var(--color-on-surface)]">978-0441172719</p></div>
+                    <div><span className="text-[var(--color-on-surface-variant)]">Categoria</span><p className="text-[var(--color-on-surface)]">Ficção científica · Ficção</p></div>
+                    <div className="flex justify-end">
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() => setIsActionsOpen((open) => !open)}
+                          aria-expanded={isActionsOpen}
+                          className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)]"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">more_horiz</span>
+                          Ações
+                          <span className="material-symbols-outlined text-[16px]">{isActionsOpen ? "expand_less" : "expand_more"}</span>
+                        </button>
+                        {isActionsOpen && (
+                          <div className="absolute right-0 z-20 mt-2 w-44 rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface-container-lowest)] py-1 shadow-lg">
+                            <button type="button" onClick={() => setIsActionsOpen(false)} className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-[var(--color-surface-container-low)]">
+                              <span className="material-symbols-outlined text-[18px]">edit</span>Editar livro
+                            </button>
+                            <button type="button" onClick={() => setIsActionsOpen(false)} className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-[var(--color-error)] hover:bg-[var(--color-error-container)]">
+                              <span className="material-symbols-outlined text-[18px]">delete</span>Excluir livro
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </article>
             </div>
 
             {/* Pagination */}
