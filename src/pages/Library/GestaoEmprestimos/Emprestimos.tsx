@@ -89,6 +89,7 @@ function Emprestimos() {
   const [data, setData] = useState("Qualquer período");
   const [busca, setBusca] = useState("");
   const [acoesAbertas, setAcoesAbertas] = useState<number | null>(null);
+  const [cartaoExpandido, setCartaoExpandido] = useState<number | null>(null);
 
   const contagemAtivos = emprestimos.filter((item) => item.status === "Ativo").length;
   const contagemAtrasados = emprestimos.filter((item) => item.status === "Atrasado").length;
@@ -151,7 +152,7 @@ function Emprestimos() {
         </section>
 
         <section className="table-card">
-          <div className="table-scroll">
+          <div className="table-scroll loans-desktop-table">
             <table>
               <thead>
                 <tr>
@@ -211,6 +212,68 @@ function Emprestimos() {
               </tbody>
             </table>
           </div>
+          <div className="loans-mobile-cards">
+            {filtrados.map((item) => {
+              const loan = formatDate(item.dataEmprestimo);
+              const due = formatDate(item.dataDevolucao);
+              const expanded = cartaoExpandido === item.id;
+              return (
+                <article key={item.id} className={`loan-mobile-card ${item.status === "Atrasado" ? "overdue-row" : ""}`}>
+                  <button
+                    type="button"
+                    className="loan-mobile-card-summary"
+                    onClick={() => setCartaoExpandido((id) => id === item.id ? null : item.id)}
+                    aria-expanded={expanded}
+                  >
+                    <div className="student-cell">
+                      <div className="initials">{item.iniciais}</div>
+                      <div className="min-w-0 text-left">
+                        <strong>{item.aluno}</strong>
+                        <small>ID: {item.alunoId}</small>
+                      </div>
+                    </div>
+                    <div className="loan-mobile-summary-end">
+                      <span className={`status-pill ${item.status === "Atrasado" ? "overdue" : "active"}`}>{item.status}</span>
+                      <span className="material-symbols-outlined">{expanded ? "expand_less" : "expand_more"}</span>
+                    </div>
+                  </button>
+                  {expanded && (
+                    <div className="loan-mobile-card-details">
+                      <div><span>Livro</span><strong>{item.livro}</strong><small>{item.autor}</small></div>
+                      <div className="loan-mobile-dates">
+                        <div><span>Data de empréstimo</span><strong>{loan.first} {loan.second}</strong></div>
+                        <div><span>Data de devolução</span><strong className={item.status === "Atrasado" ? "loan-danger-text" : ""}>{due.first} {due.second}</strong><small className={item.status === "Atrasado" ? "loan-danger-text" : ""}>{item.prazo}</small></div>
+                      </div>
+                      <div className="loan-mobile-actions">
+                        <div className="loan-actions-menu">
+                          <button
+                            type="button"
+                            className="loan-actions-trigger"
+                            onClick={() => setAcoesAbertas((aberto) => aberto === item.id ? null : item.id)}
+                            aria-label={`Abrir ações do empréstimo de ${item.aluno}`}
+                            aria-expanded={acoesAbertas === item.id}
+                          >
+                            <Icon name="more" size={18} />
+                            <span>Ações</span>
+                            <span className="material-symbols-outlined loan-actions-chevron">{acoesAbertas === item.id ? "expand_less" : "expand_more"}</span>
+                          </button>
+                          {acoesAbertas === item.id && (
+                            <div className="loan-actions-dropdown">
+                              <button type="button" onClick={() => setAcoesAbertas(null)}><span className="material-symbols-outlined">visibility</span>Ver detalhes</button>
+                              <button type="button" onClick={() => setAcoesAbertas(null)}><span className="material-symbols-outlined">assignment_turned_in</span>Registrar devolução</button>
+                              <button type="button" onClick={() => setAcoesAbertas(null)}><span className="material-symbols-outlined">autorenew</span>Renovar empréstimo</button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </article>
+              );
+            })}
+            {filtrados.length === 0 && <p className="loan-mobile-empty">Nenhum empréstimo encontrado.</p>}
+          </div>
+
           <footer className="table-footer">
             <span>Exibindo {filtrados.length || 0} de 24 empréstimos</span>
           </footer>
