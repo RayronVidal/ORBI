@@ -131,21 +131,15 @@ function Catalogo() {
 
           {/* Data Table Container */}
           <div className="bg-[var(--color-surface-container-lowest)] border border-[var(--color-surface-container-highest)] rounded-xl overflow-hidden shadow-sm flex-1 flex flex-col">
-            <div className="overflow-x-auto flex-1">
-              <table className="w-full text-left border-collapse min-w-[800px]">
+            <div className="w-full min-w-0 flex-1">
+              <table className="w-full table-fixed text-left border-collapse text-xs md:text-sm">
                 <thead>
                   <tr className="bg-[var(--color-surface-container)] text-[var(--color-on-surface-variant)] font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] uppercase tracking-wider border-b border-[var(--color-outline-variant)]">
-                    <th className="w-10 py-3 px-2 font-medium text-center">
-                      <input
-                        className="rounded border-[var(--color-outline-variant)] text-[var(--color-primary)] focus:ring-primary m-0"
-                        type="checkbox"
-                      />
-                    </th>
-                    <th className="py-3 px-4 font-medium">Detalhes do livro</th>
-                    <th className="py-3 px-4 font-medium">ISBN</th>
-                    <th className="py-3 px-4 font-medium">Categoria / gênero</th>
-                                        <th className="py-3 px-4 font-medium">Status</th>
-                    <th className="py-3 px-4 font-medium text-right">
+                    <th className="w-[34%] py-3 px-2 md:px-4 font-medium">Detalhes do livro</th>
+                    <th className="w-[18%] py-3 px-2 md:px-4 font-medium">ISBN</th>
+                    <th className="w-[20%] py-3 px-2 md:px-4 font-medium">Categoria / gênero</th>
+                    <th className="w-[13%] py-3 px-2 md:px-4 font-medium">Status</th>
+                    <th className="w-[15%] py-3 px-2 md:px-4 font-medium text-right">
                       Ações
                     </th>
                   </tr>
@@ -155,37 +149,31 @@ function Catalogo() {
 
                   {/* Row 1 */}
                 <tr className="hover:bg-[var(--color-surface-container-low)] transition-colors group">
-                    <td className="w-10 py-3 px-2 text-center">
-                      <input
-                        className="rounded border-[var(--color-outline-variant)] text-[var(--color-primary)] focus:ring-primary"
-                        type="checkbox"
-                      />
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-14 bg-[var(--color-surface-container-highest)] rounded flex items-center justify-center shrink-0">
+                    <td className="py-3 px-2 md:px-4 min-w-0">
+                      <div className="flex min-w-0 items-center gap-2 md:gap-3">
+                        <div className="hidden sm:flex w-10 h-14 bg-[var(--color-surface-container-highest)] rounded items-center justify-center shrink-0">
                           <span className="material-symbols-outlined text-[var(--color-outline)]">
                             menu_book
                           </span>
                         </div>
-                        <div>
-                          <p className="font-[var(--font-family-base)] text-[length:var(--font-size-title-lg)] text-[var(--color-on-surface)] font-semibold line-clamp-1">
+                        <div className="min-w-0">
+                          <p className="font-[var(--font-family-base)] text-xs md:text-sm text-[var(--color-on-surface)] font-semibold line-clamp-1 break-words">
                             Dune
                           </p>
-                          <p className="font-[var(--font-family-base)] text-[length:var(--font-size-body-md)] text-[var(--color-on-surface-variant)] line-clamp-1">
+                          <p className="font-[var(--font-family-base)] text-[10px] md:text-xs text-[var(--color-on-surface-variant)] line-clamp-1 break-words">
                             Frank Herbert
                           </p>
                         </div>
                       </div>
                     </td>
-                    <td className="py-3 px-4 font-[var(--font-family-base)] text-[length:var(--font-size-body-md)] text-[var(--color-on-surface)]">
+                    <td className="py-3 px-2 md:px-4 font-[var(--font-family-base)] text-[10px] md:text-xs text-[var(--color-on-surface)] break-all">
                       978-0441172719
                     </td>
-                    <td className="py-3 px-4">
-                      <p className="font-[var(--font-family-base)] text-[length:var(--font-size-body-md)] text-[var(--color-on-surface)]">
+                    <td className="py-3 px-2 md:px-4 min-w-0 break-words">
+                      <p className="font-[var(--font-family-base)] text-[10px] md:text-xs text-[var(--color-on-surface)] break-words">
                         Ficção científica
                       </p>
-                      <p className="font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] text-[var(--color-on-surface-variant)]">
+                      <p className="font-[var(--font-family-base)] text-[10px] md:text-xs text-[var(--color-on-surface-variant)]">
                         Ficção
                       </p>
                     </td>
@@ -194,14 +182,14 @@ function Catalogo() {
                         Emprestado
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-right">
+                    <td className="py-3 px-1 md:px-3 text-right">
                       <div className="relative inline-block text-left">
                         <button
                           type="button"
                           onClick={() => setIsActionsOpen((open) => !open)}
                           aria-label="Abrir ações do livro"
                           aria-expanded={isActionsOpen}
-                          className="inline-flex items-center justify-center gap-1 rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-on-surface-variant)] transition-colors hover:bg-[var(--color-surface-container-low)] hover:text-[var(--color-on-surface)]"
+                          className="inline-flex max-w-full items-center justify-center gap-0.5 rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface)] px-1.5 md:px-3 py-2 text-[10px] md:text-xs text-[var(--color-on-surface-variant)] transition-colors hover:bg-[var(--color-surface-container-low)] hover:text-[var(--color-on-surface)]"
                         >
                           <span className="material-symbols-outlined text-[18px]">more_horiz</span>
                           <span>Ações</span>
