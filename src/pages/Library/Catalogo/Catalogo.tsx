@@ -143,7 +143,7 @@ function Catalogo() {
                     </th>
                     <th className="py-3 px-4 font-medium">Detalhes do livro</th>
                     <th className="py-3 px-4 font-medium">ISBN</th>
-                    <th className="py-3 px-4 font-medium">Categoria / gênero</th>
+                    <th className="py-3 px-4 font-medium">Categoria</th>
                                         <th className="py-3 px-4 font-medium">Status</th>
                     <th className="py-3 px-4 font-medium text-right">
                       Ações
@@ -211,14 +211,6 @@ function Catalogo() {
                         </button>
                         {isActionsOpen && (
                           <div className="absolute right-0 z-20 mt-2 w-44 origin-top-right rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface-container-lowest)] py-1 text-left shadow-lg">
-                            <button
-                              type="button"
-                              onClick={() => setIsActionsOpen(false)}
-                              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-[var(--color-on-surface)] transition-colors hover:bg-[var(--color-surface-container-low)]"
-                            >
-                              <span className="material-symbols-outlined text-[18px]">qr_code_2</span>
-                              Gerar QR Code
-                            </button>
                             <button
                               type="button"
                               onClick={() => setIsActionsOpen(false)}
