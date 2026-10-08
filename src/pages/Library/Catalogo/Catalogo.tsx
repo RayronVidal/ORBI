@@ -135,34 +135,22 @@ function Catalogo() {
             <div className="hidden md:block overflow-x-auto flex-1">
               <table className="w-full table-fixed text-left border-collapse">
                 <thead>
-                  <tr className="bg-[var(--color-surface-container)] text-[var(--color-on-surface-variant)] font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] uppercase tracking-wider border-b border-[var(--color-outline-variant)]">
-                    <th className="w-10 py-3 px-2 font-medium text-center">
-                      <input
-                        className="rounded border-[var(--color-outline-variant)] text-[var(--color-primary)] focus:ring-primary m-0"
-                        type="checkbox"
-                      />
-                    </th>
-                    <th className="py-3 px-2 md:px-3 font-medium">Detalhes do livro</th>
-                    <th className="py-3 px-2 md:px-3 font-medium">ISBN</th>
-                    <th className="py-3 px-2 md:px-3 font-medium">Categoria</th>
-                                        <th className="py-3 px-2 md:px-3 font-medium">Status</th>
-                    <th className="py-3 px-2 md:px-3 font-medium text-right">
+                  <tr className="w-full bg-[var(--color-surface-container)] text-[var(--color-on-surface-variant)] font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] uppercase tracking-wider border-b border-[var(--color-outline-variant)]">
+                    
+                    <th className="py-3 px-4 font-medium">Detalhes do livro</th>
+                    <th className="py-3 px-4 font-medium">ISBN</th>
+                    <th className="py-3 px-4 font-medium">Categoria</th>
+                                        <th className="py-3 px-4 font-medium">Status</th>
+                    <th className="py-3 px-4 font-medium text-right">
                       Ações
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--color-surface-container-high)] bg-[var(--color-surface-container-lowest)]">
-
-
                   {/* Row 1 */}
                 <tr className="hover:bg-[var(--color-surface-container-low)] transition-colors group">
-                    <td className="w-10 py-3 px-2 text-center">
-                      <input
-                        className="rounded border-[var(--color-outline-variant)] text-[var(--color-primary)] focus:ring-primary"
-                        type="checkbox"
-                      />
-                    </td>
-                    <td className="py-3 px-2 md:px-3">
+                    
+                    <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-14 bg-[var(--color-surface-container-highest)] rounded flex items-center justify-center shrink-0">
                           <span className="material-symbols-outlined text-[var(--color-outline)]">
@@ -202,7 +190,7 @@ function Catalogo() {
                           onClick={() => setIsActionsOpen((open) => !open)}
                           aria-label="Abrir ações do livro"
                           aria-expanded={isActionsOpen}
-                          className="inline-flex items-center justify-center gap-1 rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-on-surface-variant)] transition-colors hover:bg-[var(--color-surface-container-low)] hover:text-[var(--color-on-surface)]"
+                          className="inline-flex items-center justify-center gap-1 rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface)] px-1 py-2 text-sm text-[var(--color-on-surface-variant)] transition-colors hover:bg-[var(--color-surface-container-low)] hover:text-[var(--color-on-surface)]"
                         >
                           <span className="material-symbols-outlined text-[18px]">more_horiz</span>
                           <span>Ações</span>

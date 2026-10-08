@@ -12,12 +12,12 @@ export default function Inicio() {
                 Visão geral
               </h2>
               <p className="font-normal text-lg text-[var(--color-on-surface-variant)] mt-1">
-                Status do sistema e principais métricas
+                Bem vindo Professor(a): 
               </p>
             </div>
             
-            {<Button text="Exportar relatório" NomeClasse="material-symbols-outlined" icon="download"/>}
           </div>
+            {<Button text="Exportar relatório" NomeClasse="material-symbols-outlined" icon="download"/>}
           
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-[var(--stack-md)]">

@@ -156,7 +156,7 @@ function Emprestimos() {
             <table>
               <thead>
                 <tr>
-                  <th>ALUNO</th><th>DETALHES DO LIVRO</th><th>DATA DE EMPRÉSTIMO</th><th>DATA DE DEVOLUÇÃO</th><th>STATUS</th><th>AÇÕES</th>
+                  <th>ALUNO</th><th>LIVRO</th><th>DATA DE EMPRÉSTIMO</th><th>DATA DE DEVOLUÇÃO</th><th>STATUS</th><th>AÇÕES</th>
                 </tr>
               </thead>
               <tbody>
