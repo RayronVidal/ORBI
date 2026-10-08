@@ -1,447 +1,283 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+
+type Categoria = { id_categoria: number; nome_categoria: string };
+type Livro = {
+  id_livro: number;
+  titulo_livro: string;
+  codigo_livro: string;
+  autor_livro: string | null;
+  isbn: string | null;
+  id_categoria: number | null;
+  quantidade_total: number;
+  quantidade_disponivel: number;
+  status_livro: boolean;
+  status_exibicao?: string;
+  tbl_categorias?: Categoria | null;
+};
+type LivroForm = {
+  titulo_livro: string;
+  codigo_livro: string;
+  autor_livro: string;
+  isbn: string;
+  id_categoria: string;
+  quantidade_total: string;
+  status_livro: boolean;
+};
+
+const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\/$/, "");
+const EMPTY_FORM: LivroForm = {
+  titulo_livro: "", codigo_livro: "", autor_livro: "", isbn: "",
+  id_categoria: "", quantidade_total: "1", status_livro: true,
+};
+
+function getToken() {
+  const direct = localStorage.getItem("token");
+  if (direct) return direct;
+  for (const key of ["usuario", "user", "orbi_usuario", "auth"]) {
+    try {
+      const value = localStorage.getItem(key);
+      if (value) {
+        const parsed = JSON.parse(value);
+        if (parsed?.token) return parsed.token;
+      }
+    } catch { /* ignora valores que não sejam JSON */ }
+  }
+  return "";
+}
+
+async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
+  const token = getToken();
+  const response = await fetch(`${API_URL}${path}`, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...init.headers,
+    },
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data?.erro || data?.mensagem || "Não foi possível concluir a operação.");
+  return data as T;
+}
+
+function statusLivro(livro: Livro) {
+  if (!livro.status_livro) return "Inativo";
+  if (livro.quantidade_disponivel > 0) return "Disponível";
+  return "Emprestado";
+}
 
 function Catalogo() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isActionsOpen, setIsActionsOpen] = useState(false);
-  const [mobileBookExpanded, setMobileBookExpanded] = useState(false);
+  const [livros, setLivros] = useState<Livro[]>([]);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [busca, setBusca] = useState("");
+  const [categoriaFiltro, setCategoriaFiltro] = useState("");
+  const [statusFiltro, setStatusFiltro] = useState("");
+  const [modalAberto, setModalAberto] = useState(false);
+  const [livroEditando, setLivroEditando] = useState<Livro | null>(null);
+  const [form, setForm] = useState<LivroForm>(EMPTY_FORM);
+  const [acoesAbertas, setAcoesAbertas] = useState<number | null>(null);
+  const [carregando, setCarregando] = useState(true);
+  const [salvando, setSalvando] = useState(false);
+  const [erro, setErro] = useState("");
+  const [sucesso, setSucesso] = useState("");
+
+  const carregarDados = useCallback(async () => {
+    setCarregando(true);
+    setErro("");
+    try {
+      const [listaLivros, listaCategorias] = await Promise.all([
+        apiRequest<Livro[]>("/api/livros"),
+        apiRequest<Categoria[]>("/api/categorias"),
+      ]);
+      setLivros(listaLivros);
+      setCategorias(listaCategorias);
+    } catch (error) {
+      setErro(error instanceof Error ? error.message : "Erro ao carregar o catálogo.");
+    } finally {
+      setCarregando(false);
+    }
+  }, []);
+
+  useEffect(() => { void carregarDados(); }, [carregarDados]);
+
+  const livrosFiltrados = useMemo(() => {
+    const termo = busca.trim().toLocaleLowerCase("pt-BR");
+    return livros.filter((livro) => {
+      const correspondeBusca = !termo ||
+        livro.titulo_livro.toLocaleLowerCase("pt-BR").includes(termo) ||
+        (livro.isbn || "").toLocaleLowerCase("pt-BR").includes(termo);
+      const correspondeCategoria = !categoriaFiltro || String(livro.id_categoria || "") === categoriaFiltro;
+      const correspondeStatus = !statusFiltro || statusLivro(livro).toLocaleLowerCase("pt-BR") === statusFiltro.toLocaleLowerCase("pt-BR");
+      return correspondeBusca && correspondeCategoria && correspondeStatus;
+    });
+  }, [livros, busca, categoriaFiltro, statusFiltro]);
+
+  const abrirCadastro = (livro?: Livro) => {
+    setErro("");
+    setSucesso("");
+    setLivroEditando(livro || null);
+    setForm(livro ? {
+      titulo_livro: livro.titulo_livro || "",
+      codigo_livro: livro.codigo_livro || "",
+      autor_livro: livro.autor_livro || "",
+      isbn: livro.isbn || "",
+      id_categoria: livro.id_categoria ? String(livro.id_categoria) : "",
+      quantidade_total: String(livro.quantidade_total || 1),
+      status_livro: Boolean(livro.status_livro),
+    } : EMPTY_FORM);
+    setModalAberto(true);
+    setAcoesAbertas(null);
+  };
+
+  const salvarLivro = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setErro("");
+    setSucesso("");
+    setSalvando(true);
+    const payload = {
+      titulo_livro: form.titulo_livro.trim(),
+      codigo_livro: form.codigo_livro.trim(),
+      autor_livro: form.autor_livro.trim(),
+      isbn: form.isbn.trim(),
+      id_categoria: form.id_categoria ? Number(form.id_categoria) : null,
+      quantidade_total: Number(form.quantidade_total),
+      status_livro: form.status_livro,
+    };
+    try {
+      if (livroEditando) {
+        await apiRequest(`/api/livros/${livroEditando.id_livro}`, {
+          method: "PUT", body: JSON.stringify(payload),
+        });
+        setSucesso("Livro atualizado com sucesso.");
+      } else {
+        await apiRequest("/api/livros", { method: "POST", body: JSON.stringify(payload) });
+        setSucesso("Livro cadastrado com sucesso.");
+      }
+      setModalAberto(false);
+      await carregarDados();
+    } catch (error) {
+      setErro(error instanceof Error ? error.message : "Não foi possível salvar o livro.");
+    } finally {
+      setSalvando(false);
+    }
+  };
+
+  const excluirLivro = async (livro: Livro) => {
+    setAcoesAbertas(null);
+    if (!window.confirm(`Deseja realmente excluir “${livro.titulo_livro}”?`)) return;
+    setErro("");
+    setSucesso("");
+    try {
+      await apiRequest(`/api/livros/${livro.id_livro}`, { method: "DELETE" });
+      setSucesso("Livro excluído com sucesso.");
+      await carregarDados();
+    } catch (error) {
+      setErro(error instanceof Error ? error.message : "Não foi possível excluir o livro.");
+    }
+  };
+
+  const alternarStatus = async (livro: Livro) => {
+    setAcoesAbertas(null);
+    try {
+      await apiRequest(`/api/livros/${livro.id_livro}`, {
+        method: "PUT", body: JSON.stringify({ status_livro: !livro.status_livro }),
+      });
+      setSucesso(livro.status_livro ? "Livro desativado." : "Livro ativado.");
+      await carregarDados();
+    } catch (error) {
+      setErro(error instanceof Error ? error.message : "Não foi possível alterar o status.");
+    }
+  };
+
+  const classeStatus = (status: string) => {
+    if (status === "Disponível") return "bg-emerald-50 text-emerald-700";
+    if (status === "Emprestado") return "bg-amber-50 text-amber-700";
+    return "bg-slate-100 text-slate-600";
+  };
 
   return (
-    <div className="bg-[var(--color-background)] text-[var(--color-on-background)] font-[var(--font-family-base)] min-h-screen flex">
-      {/* Main Content Area */}
-      <main className="flex-1 min-w-0 flex flex-col min-h-screen">
-        {/* TopNavBar */}
-        <header className="flex justify-between items-center h-16 px-4 md:px-8 bg-[var(--color-surface-container-lowest)] border-b border-[var(--color-outline-variant)] sticky top-0 z-30">
-          {/* Mobile Menu Toggle */}
-          <button className="md:hidden p-2 text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)] rounded-full transition-all">
-            <span className="material-symbols-outlined">menu</span>
+    <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-on-background)] font-[var(--font-family-base)]">
+      <main className="mx-auto flex w-full min-w-0 max-w-[1600px] flex-col gap-6 p-4 md:p-8">
+        <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-[var(--color-on-background)] md:text-3xl">Gerenciamento do catálogo</h1>
+            <p className="mt-1 text-sm text-[var(--color-on-surface-variant)]">Consulte, organize e mantenha o acervo da sua instituição.</p>
+          </div>
+          <button type="button" onClick={() => abrirCadastro()} className="inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90">
+            <span className="material-symbols-outlined text-xl">add</span> Adicionar livro
           </button>
-
-          {/* Search Area */}
-          <div className="flex-1 max-w-2xl hidden md:flex items-center relative">
-            <span className="material-symbols-outlined absolute left-3 text-[var(--color-on-surface-variant)]">
-              search
-            </span>
-            <input
-              className="w-full pl-10 pr-4 py-2 bg-[var(--color-surface-container-low)] border border-[var(--color-outline-variant)] rounded-full font-[var(--font-family-base)] text-[var(--color-on-surface)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-primary transition-shadow"
-              placeholder="Buscar no catálogo..."
-              type="text"
-            />
-          </div>
-
-          <div className="flex-1 md:hidden"></div>
-
-          {/* Ações */}
-          <div className="flex items-center gap-2">
-            <button className="p-2 text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)] rounded-full transition-all relative">
-              <span className="material-symbols-outlined">notifications</span>
-              <span className="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
-            </button>
-
-            <div className="h-8 w-px bg-outline-variant mx-2 hidden md:block"></div>
-
-            <button className="flex items-center gap-2 hover:bg-[var(--color-surface-container-low)] p-1 pr-3 rounded-full transition-all">
-              <img
-                className="w-8 h-8 rounded-full object-cover border border-[var(--color-outline-variant)]"
-                alt="Librarian J."
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAoebFgyIOSeuy1fI9eNLCYKN7kNezbVW-hifWmqw33afvydvb1-j2GEagKEW3Mcp52ZsNtI9EPfLFgJzdtjbHmqn9QvLI4SlwIkjCP5hZ_SEWmC6nLAN5xsU13xaUCF2HfO88wKZVx-eJGgre6k_8TGfZ77ljWcaqjfsWbQZqGinzHBOcEOpv57XAx5_ljeVE_2oY881QtsG6qZ7BP4Yn9sbEV-qYb0XTWB8_V8aIqTpJ0QIg-zp1Jg"
-              />
-              <span className="font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] text-[var(--color-on-surface-variant)] hidden md:block">
-                Librarian J.
-              </span>
-            </button>
-          </div>
         </header>
 
-        {/* Page Content */}
-        <div className="flex-1 p-4 md:p-8 bg-[var(--color-background)] flex flex-col gap-6">
-          {/* Page Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h2 className="font-semibold text-2xl md:text-3xl text-[var(--color-on-background)] tracking-tight">
-                Gerenciamento do catálogo
-              </h2>
-              <p className="font-[var(--font-family-base)] text-[length:var(--font-size-body-md)] text-[var(--color-on-surface-variant)] mt-1">
-                Manage menu_books, inventory, and availability.
-              </p>
-            </div>
+        {erro && <div role="alert" className="flex items-start justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"><span>{erro}</span><button type="button" onClick={() => setErro("")} aria-label="Fechar aviso">×</button></div>}
+        {sucesso && <div role="status" className="flex items-start justify-between gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"><span>{sucesso}</span><button type="button" onClick={() => setSucesso("")} aria-label="Fechar aviso">×</button></div>}
 
-            {/* Botão de Adicionar livro */}
-            <button
-              type="button"
-              onClick={() => setIsModalOpen(true)}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[var(--color-primary-container)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-fixed-dim)]"
-            >
-              <span className="material-symbols-outlined text-[20px]">add</span>
-              Adicionar livro
-            </button>
+        <section className="flex flex-col gap-3 rounded-xl border border-[var(--color-outline-variant)] bg-[var(--color-surface-container-lowest)] p-4 shadow-sm md:flex-row md:items-center">
+          <select aria-label="Filtrar por categoria" value={categoriaFiltro} onChange={(e) => setCategoriaFiltro(e.target.value)} className="rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface)] px-3 py-2.5 text-sm text-[var(--color-on-surface)] outline-none focus:border-[var(--color-primary)]">
+            <option value="">Todas as categorias</option>
+            {categorias.map((categoria) => <option key={categoria.id_categoria} value={categoria.id_categoria}>{categoria.nome_categoria}</option>)}
+          </select>
+          <select aria-label="Filtrar por status" value={statusFiltro} onChange={(e) => setStatusFiltro(e.target.value)} className="rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface)] px-3 py-2.5 text-sm text-[var(--color-on-surface)] outline-none focus:border-[var(--color-primary)]">
+            <option value="">Todos os status</option>
+            <option value="Disponível">Disponível</option>
+            <option value="Emprestado">Emprestado</option>
+            <option value="Inativo">Inativo</option>
+          </select>
+          <div className="relative min-w-0 flex-1">
+            <span className="material-symbols-outlined absolute left-3 top-2.5 text-lg text-[var(--color-on-surface-variant)]">search</span>
+            <input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Buscar por ISBN ou título..." aria-label="Buscar por ISBN ou título" className="w-full rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface)] py-2.5 pl-10 pr-3 text-sm text-[var(--color-on-surface)] outline-none focus:border-[var(--color-primary)]" />
           </div>
+          <button type="button" onClick={() => { setBusca(""); setCategoriaFiltro(""); setStatusFiltro(""); }} className="rounded-lg border border-[var(--color-outline-variant)] px-3 py-2.5 text-sm text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)]">Limpar filtros</button>
+        </section>
 
-          {/* Filters & Controls Bar */}
-          <div className="bg-[var(--color-surface-container-lowest)] border border-[var(--color-surface-container-highest)] rounded-xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between shadow-sm">
-            {/* Quick Filters */}
-            <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-              <div className="relative">
-                <select className="appearance-none bg-[var(--color-surface-container-low)] border border-[var(--color-outline-variant)] text-[var(--color-on-surface)] font-[var(--font-family-base)] py-2 pl-4 pr-10 rounded-lg focus:outline-none focus:border-[var(--color-primary)] transition-colors cursor-pointer">
-                  <option>Todas as categorias</option>
-                  <option>Ficção</option>
-                  <option>Non-Ficção</option>
-                  <option>Ciências</option>
-                  <option>História</option>
-                </select>
-                <span className="material-symbols-outlined absolute right-2 top-2.5 text-[var(--color-on-surface-variant)] pointer-events-none">
-                  chevron_right
-                </span>
-              </div>
-              <div className="relative">
-                <select className="appearance-none bg-[var(--color-surface-container-low)] border border-[var(--color-outline-variant)] text-[var(--color-on-surface)] font-[var(--font-family-base)] py-2 pl-4 pr-10 rounded-lg focus:outline-none focus:border-[var(--color-primary)] transition-colors cursor-pointer">
-                  <option>Status: todos</option>
-                  <option>Disponível</option>
-                  <option>Emprestado</option>
-                  <option>Reservado</option>
-                  <option>Em manutenção</option>
-                </select>
-                <span className="material-symbols-outlined absolute right-2 top-2.5 text-[var(--color-on-surface-variant)] pointer-events-none">
-                  chevron_right
-                </span>
-              </div>
-              <button className="flex items-center gap-2 px-4 py-2 border border-[var(--color-outline-variant)] text-[var(--color-on-surface-variant)] font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] rounded-lg hover:bg-[var(--color-surface-container-low)] transition-colors">
-                <span className="material-symbols-outlined text-[18px]">
-                  filter_list
-                </span>
-                Filtros avançados
-              </button>
-            </div>
-
-            {/* Search & Sort */}
-            <div className="flex items-center gap-3 w-full md:w-auto">
-              <div className="relative flex-1 md:w-64">
-                <span className="material-symbols-outlined absolute left-3 top-2.5 text-[var(--color-on-surface-variant)] text-[18px]">
-                  search
-                </span>
-                <input
-                  className="w-full pl-9 pr-4 py-2 bg-[var(--color-surface)] border border-[var(--color-outline-variant)] rounded-lg font-[var(--font-family-base)] text-[var(--color-on-surface)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-primary transition-shadow"
-                  placeholder="Buscar ISBN ou título..."
-                  type="text"
-                />
-              </div>
-              <button
-                className="p-2 border border-[var(--color-outline-variant)] text-[var(--color-on-surface-variant)] rounded-lg hover:bg-[var(--color-surface-container-low)] transition-colors"
-                title="Opções de ordenação"
-              >
-                <span className="material-symbols-outlined text-[20px]">
-                  filter_list
-                </span>
-              </button>
-            </div>
+        <section className="overflow-visible rounded-xl border border-[var(--color-outline-variant)] bg-[var(--color-surface-container-lowest)] shadow-sm">
+          <div className="flex items-center justify-between border-b border-[var(--color-outline-variant)] px-4 py-3">
+            <p className="text-sm text-[var(--color-on-surface-variant)]"><strong className="text-[var(--color-on-surface)]">{livrosFiltrados.length}</strong> {livrosFiltrados.length === 1 ? "livro encontrado" : "livros encontrados"}</p>
+            <button type="button" onClick={() => void carregarDados()} className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm text-[var(--color-primary)] hover:bg-[var(--color-surface-container-low)]"><span className="material-symbols-outlined text-lg">refresh</span> Atualizar</button>
           </div>
-
-          {/* Data Table Container */}
-          <div className="bg-[var(--color-surface-container-lowest)] border border-[var(--color-surface-container-highest)] rounded-xl overflow-hidden shadow-sm flex-1 flex flex-col">
-            <div className="w-full min-w-0 flex-1 overflow-x-auto">
-              <table className="w-full table-fixed text-left border-collapse text-xs md:text-sm">
-                <thead>
-                  <tr className="bg-[var(--color-surface-container)] text-[var(--color-on-surface-variant)] font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] uppercase tracking-wider border-b border-[var(--color-outline-variant)]">
-                    <th className="w-[34%] py-3 px-2 md:px-4 font-medium">Detalhes do livro</th>
-                    <th className="w-[18%] py-3 px-2 md:px-4 font-medium">ISBN</th>
-                    <th className="w-[20%] py-3 px-2 md:px-4 font-medium">Categoria / gênero</th>
-                    <th className="w-[13%] py-3 px-2 md:px-4 font-medium">Status</th>
-                    <th className="w-[15%] py-3 px-2 md:px-4 font-medium text-right">
-                      Ações
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[var(--color-surface-container-high)] bg-[var(--color-surface-container-lowest)]">
-                  {/* Row 1 */}
-                  <tr className="hover:bg-[var(--color-surface-container-low)] transition-colors group">
-                    <td className="py-3 px-2 md:px-4 min-w-0">
-                      <div className="flex min-w-0 items-center gap-2 md:gap-3">
-                        <div className="hidden sm:flex w-10 h-14 bg-[var(--color-surface-container-highest)] rounded items-center justify-center shrink-0">
-                          <span className="material-symbols-outlined text-[var(--color-outline)]">
-                            menu_book
-                          </span>
-                        </div>
-                        <div className="min-w-0">
-                          <p className="font-[var(--font-family-base)] text-xs md:text-sm text-[var(--color-on-surface)] font-semibold line-clamp-1 break-words">
-                            Dune
-                          </p>
-                          <p className="font-[var(--font-family-base)] text-[10px] md:text-xs text-[var(--color-on-surface-variant)] line-clamp-1 break-words">
-                            Frank Herbert
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-3 px-2 md:px-4 font-[var(--font-family-base)] text-[10px] md:text-xs text-[var(--color-on-surface)] break-all">
-                      978-0441172719
-                    </td>
-                    <td className="py-3 px-2 md:px-4 min-w-0 break-words">
-                      <p className="font-[var(--font-family-base)] text-[10px] md:text-xs text-[var(--color-on-surface)] break-words">
-                        Ficção científica
-                      </p>
-                      <p className="font-[var(--font-family-base)] text-[10px] md:text-xs text-[var(--color-on-surface-variant)]">
-                        Ficção
-                      </p>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] font-medium bg-[var(--color-surface-container-highest)] text-[var(--color-on-surface-variant)]">
-                        Emprestado
-                      </span>
-                    </td>
-                    <td className="py-3 px-1 md:px-3 text-right">
-                      <div className="relative inline-block text-left">
-                        <button
-                          type="button"
-                          onClick={() => setIsActionsOpen((open) => !open)}
-                          aria-label="Abrir ações do livro"
-                          aria-expanded={isActionsOpen}
-                          className="inline-flex max-w-full items-center justify-center gap-0.5 rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface)] px-1.5 md:px-3 py-2 text-[10px] md:text-xs text-[var(--color-on-surface-variant)] transition-colors hover:bg-[var(--color-surface-container-low)] hover:text-[var(--color-on-surface)]"
-                        >
-                          <span className="material-symbols-outlined text-[18px]">more_horiz</span>
-                          <span>Ações</span>
-                          <span className="material-symbols-outlined text-[16px]">
-                            {isActionsOpen ? "expand_less" : "expand_more"}
-                          </span>
-                        </button>
-                        {isActionsOpen && (
-                          <div className="absolute right-0 z-20 mt-2 w-44 origin-top-right rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface-container-lowest)] py-1 text-left shadow-lg">
-                            <button
-                              type="button"
-                              onClick={() => setIsActionsOpen(false)}
-                              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-[var(--color-on-surface)] transition-colors hover:bg-[var(--color-surface-container-low)]"
-                            >
-                              <span className="material-symbols-outlined text-[18px]">edit</span>
-                              Editar livro
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setIsActionsOpen(false)}
-                              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-[var(--color-error)] transition-colors hover:bg-[var(--color-error-container)]"
-                            >
-                              <span className="material-symbols-outlined text-[18px]">delete</span>
-                              Excluir livro
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            {/* Mobile book card */}
-            <div className="md:hidden p-3">
-              <article className="rounded-xl border border-[var(--color-outline-variant)] bg-[var(--color-surface)] p-4 shadow-sm">
-                <button
-                  type="button"
-                  onClick={() => setMobileBookExpanded((expanded) => !expanded)}
-                  aria-expanded={mobileBookExpanded}
-                  className="flex w-full items-center gap-3 text-left"
-                >
-                  <div className="flex h-14 w-11 shrink-0 items-center justify-center rounded bg-[var(--color-surface-container-highest)]">
-                    <span className="material-symbols-outlined text-[var(--color-outline)]">menu_book</span>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold text-[var(--color-on-surface)]">Dune</p>
-                    <p className="truncate text-sm text-[var(--color-on-surface-variant)]">Frank Herbert</p>
-                    <span className="mt-1 inline-flex rounded-full bg-[var(--color-surface-container-highest)] px-2 py-0.5 text-xs text-[var(--color-on-surface-variant)]">Emprestado</span>
-                  </div>
-                  <span className="material-symbols-outlined text-[var(--color-on-surface-variant)]">
-                    {mobileBookExpanded ? "expand_less" : "expand_more"}
-                  </span>
-                </button>
-                {mobileBookExpanded && (
-                  <div className="mt-4 space-y-3 border-t border-[var(--color-outline-variant)] pt-3 text-sm">
-                    <div><span className="text-[var(--color-on-surface-variant)]">ISBN</span><p className="break-all text-[var(--color-on-surface)]">978-0441172719</p></div>
-                    <div><span className="text-[var(--color-on-surface-variant)]">Categoria</span><p className="text-[var(--color-on-surface)]">Ficção científica · Ficção</p></div>
-                    <div className="flex justify-end">
-                      <div className="relative">
-                        <button
-                          type="button"
-                          onClick={() => setIsActionsOpen((open) => !open)}
-                          aria-expanded={isActionsOpen}
-                          className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)]"
-                        >
-                          <span className="material-symbols-outlined text-[18px]">more_horiz</span>
-                          Ações
-                          <span className="material-symbols-outlined text-[16px]">{isActionsOpen ? "expand_less" : "expand_more"}</span>
-                        </button>
-                        {isActionsOpen && (
-                          <div className="absolute right-0 z-20 mt-2 w-44 rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface-container-lowest)] py-1 shadow-lg">
-                            <button type="button" onClick={() => setIsActionsOpen(false)} className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-[var(--color-surface-container-low)]">
-                              <span className="material-symbols-outlined text-[18px]">edit</span>Editar livro
-                            </button>
-                            <button type="button" onClick={() => setIsActionsOpen(false)} className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-[var(--color-error)] hover:bg-[var(--color-error-container)]">
-                              <span className="material-symbols-outlined text-[18px]">delete</span>Excluir livro
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </article>
-            </div>
-
-            {/* Pagination */}
-            <div className="bg-[var(--color-surface)] border-t border-[var(--color-outline-variant)] px-4 py-3 flex items-center justify-between">
-              <div className="font-[var(--font-family-base)] text-[length:var(--font-size-body-md)] text-[var(--color-on-surface-variant)]">
-                Exibindo <span className="font-medium text-[var(--color-on-surface)]">1</span> to{" "}
-                <span className="font-medium text-[var(--color-on-surface)]">10</span> of{" "}
-                <span className="font-medium text-[var(--color-on-surface)]">97</span> resultados
-              </div>
-              <div className="flex items-center gap-1">
-                <button
-                  className="px-3 py-1 border border-[var(--color-outline-variant)] rounded bg-[var(--color-surface-container-low)] text-[var(--color-on-surface-variant)] disabled:opacity-50"
-                  disabled
-                >
-                  Anterior
-                </button>
-                <button className="px-3 py-1 border border-[var(--color-outline-variant)] rounded bg-[var(--color-surface)] text-[var(--color-on-surface)] hover:bg-[var(--color-surface-container-low)] transition-colors">
-                  1
-                </button>
-                <button className="px-3 py-1 border border-[var(--color-primary)] rounded bg-[var(--color-primary-container)] text-[var(--color-on-primary-container)] font-medium">
-                  2
-                </button>
-                <button className="px-3 py-1 border border-[var(--color-outline-variant)] rounded bg-[var(--color-surface)] text-[var(--color-on-surface)] hover:bg-[var(--color-surface-container-low)] transition-colors">
-                  3
-                </button>
-                <span className="px-2 text-[var(--color-on-surface-variant)]">...</span>
-                <button className="px-3 py-1 border border-[var(--color-outline-variant)] rounded bg-[var(--color-surface)] text-[var(--color-on-surface)] hover:bg-[var(--color-surface-container-low)] transition-colors">
-                  10
-                </button>
-                <button className="px-3 py-1 border border-[var(--color-outline-variant)] rounded bg-[var(--color-surface)] text-[var(--color-on-surface)] hover:bg-[var(--color-surface-container-low)] transition-colors">
-                  Próxima
-                </button>
-              </div>
-            </div>
+          <div className="w-full overflow-x-auto">
+            <table className="w-full min-w-[760px] border-collapse text-left text-sm">
+              <thead><tr className="border-b border-[var(--color-outline-variant)] bg-[var(--color-surface-container)] text-xs uppercase tracking-wide text-[var(--color-on-surface-variant)]">
+                <th className="px-4 py-3 font-semibold">Detalhes do livro</th><th className="px-4 py-3 font-semibold">ISBN</th><th className="px-4 py-3 font-semibold">Categoria</th><th className="px-4 py-3 font-semibold">Disponibilidade</th><th className="px-4 py-3 text-right font-semibold">Ações</th>
+              </tr></thead>
+              <tbody className="divide-y divide-[var(--color-outline-variant)]">
+                {carregando ? <tr><td colSpan={5} className="px-4 py-12 text-center text-[var(--color-on-surface-variant)]"><span className="material-symbols-outlined mb-2 block animate-spin text-2xl">progress_activity</span>Carregando catálogo...</td></tr>
+                : livrosFiltrados.length === 0 ? <tr><td colSpan={5} className="px-4 py-12 text-center text-[var(--color-on-surface-variant)]"><span className="material-symbols-outlined mb-2 block text-3xl">menu_book</span>Nenhum livro encontrado com os filtros selecionados.</td></tr>
+                : livrosFiltrados.map((livro) => {
+                  const status = statusLivro(livro);
+                  return <tr key={livro.id_livro} className="transition-colors hover:bg-[var(--color-surface-container-low)]">
+                    <td className="px-4 py-4"><div className="flex items-center gap-3"><div className="flex h-12 w-10 shrink-0 items-center justify-center rounded bg-[var(--color-surface-container-highest)]"><span className="material-symbols-outlined text-[var(--color-on-surface-variant)]">menu_book</span></div><div className="min-w-0"><p className="font-semibold text-[var(--color-on-surface)]">{livro.titulo_livro}</p><p className="mt-0.5 text-xs text-[var(--color-on-surface-variant)]">{livro.autor_livro || "Autor não informado"} · Código: {livro.codigo_livro}</p></div></div></td>
+                    <td className="px-4 py-4 text-[var(--color-on-surface)]">{livro.isbn || "—"}</td>
+                    <td className="px-4 py-4 text-[var(--color-on-surface)]">{livro.tbl_categorias?.nome_categoria || "Sem categoria"}</td>
+                    <td className="px-4 py-4"><div className="flex flex-col items-start gap-1"><span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${classeStatus(status)}`}>{status}</span><span className="text-xs text-[var(--color-on-surface-variant)]">{livro.quantidade_disponivel} de {livro.quantidade_total} disponíveis</span></div></td>
+                    <td className="px-4 py-4 text-right"><div className="relative inline-block text-left"><button type="button" aria-label={`Ações para ${livro.titulo_livro}`} aria-expanded={acoesAbertas === livro.id_livro} onClick={() => setAcoesAbertas(acoesAbertas === livro.id_livro ? null : livro.id_livro)} className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-outline-variant)] px-3 py-2 text-xs text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)]"><span className="material-symbols-outlined text-lg">more_horiz</span>Ações<span className="material-symbols-outlined text-base">{acoesAbertas === livro.id_livro ? "expand_less" : "expand_more"}</span></button>
+                      {acoesAbertas === livro.id_livro && <div className="absolute right-0 z-20 mt-2 w-48 rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface-container-lowest)] py-1 text-left shadow-xl"><button type="button" onClick={() => abrirCadastro(livro)} className="flex w-full items-center gap-2 px-3 py-2.5 text-sm hover:bg-[var(--color-surface-container-low)]"><span className="material-symbols-outlined text-lg">edit</span>Editar livro</button><button type="button" onClick={() => void alternarStatus(livro)} className="flex w-full items-center gap-2 px-3 py-2.5 text-sm hover:bg-[var(--color-surface-container-low)]"><span className="material-symbols-outlined text-lg">{livro.status_livro ? "visibility_off" : "visibility"}</span>{livro.status_livro ? "Desativar livro" : "Ativar livro"}</button><button type="button" onClick={() => void excluirLivro(livro)} className="flex w-full items-center gap-2 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50"><span className="material-symbols-outlined text-lg">delete</span>Excluir livro</button></div>}
+                    </div></td>
+                  </tr>;
+                })}
+              </tbody>
+            </table>
           </div>
-        </div>
+        </section>
       </main>
 
-      {/* Modal: New Book Form */}
-      {isModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-on-background/50 backdrop-blur-sm"
-          id="newBookModal"
-        >
-          <div className="bg-[var(--color-surface-container-lowest)] w-full max-w-2xl rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] border border-[var(--color-outline-variant)] flex flex-col max-h-[521px]">
-            {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-[var(--color-outline-variant)] flex justify-between items-center bg-[var(--color-surface)]">
-              <h3 className="font-[var(--font-family-base)] text-[length:var(--font-size-headline-md)] text-[var(--color-on-surface)] font-semibold">
-                Adicionar novo livro
-              </h3>
-              <button
-                className="text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-highest)] p-1 rounded-full transition-colors"
-                onClick={() => setIsModalOpen(false)}
-                aria-label="Fechar formulário"
-              >
-                <span className="material-symbols-outlined">close</span>
-              </button>
+      {modalAberto && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setModalAberto(false); }}>
+        <section role="dialog" aria-modal="true" aria-labelledby="livro-modal-title" className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-[var(--color-outline-variant)] bg-[var(--color-surface-container-lowest)] shadow-2xl">
+          <header className="flex items-center justify-between border-b border-[var(--color-outline-variant)] px-6 py-4"><div><h2 id="livro-modal-title" className="text-xl font-semibold text-[var(--color-on-surface)]">{livroEditando ? "Editar livro" : "Adicionar novo livro"}</h2><p className="mt-1 text-sm text-[var(--color-on-surface-variant)]">Os dados serão salvos no acervo da sua instituição.</p></div><button type="button" onClick={() => setModalAberto(false)} aria-label="Fechar" className="rounded-lg p-2 hover:bg-[var(--color-surface-container-low)]"><span className="material-symbols-outlined">close</span></button></header>
+          <form onSubmit={salvarLivro} className="flex min-h-0 flex-1 flex-col">
+            <div className="grid gap-4 overflow-y-auto p-6 sm:grid-cols-2">
+              {erro && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700 sm:col-span-2">{erro}</p>}
+              <label className="flex flex-col gap-1.5 text-sm font-medium text-[var(--color-on-surface)]">Título *<input required maxLength={255} value={form.titulo_livro} onChange={(e) => setForm({ ...form, titulo_livro: e.target.value })} className="rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface)] px-3 py-2.5 font-normal outline-none focus:border-[var(--color-primary)]" placeholder="Título do livro" /></label>
+              <label className="flex flex-col gap-1.5 text-sm font-medium text-[var(--color-on-surface)]">Código do livro *<input required maxLength={50} value={form.codigo_livro} onChange={(e) => setForm({ ...form, codigo_livro: e.target.value })} className="rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface)] px-3 py-2.5 font-normal outline-none focus:border-[var(--color-primary)]" placeholder="Código único do acervo" /></label>
+              <label className="flex flex-col gap-1.5 text-sm font-medium text-[var(--color-on-surface)] sm:col-span-2">Autor(es)<input maxLength={255} value={form.autor_livro} onChange={(e) => setForm({ ...form, autor_livro: e.target.value })} className="rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface)] px-3 py-2.5 font-normal outline-none focus:border-[var(--color-primary)]" placeholder="Nome do autor" /></label>
+              <label className="flex flex-col gap-1.5 text-sm font-medium text-[var(--color-on-surface)]">ISBN<input maxLength={20} value={form.isbn} onChange={(e) => setForm({ ...form, isbn: e.target.value })} className="rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface)] px-3 py-2.5 font-normal outline-none focus:border-[var(--color-primary)]" placeholder="ISBN (opcional)" /></label>
+              <label className="flex flex-col gap-1.5 text-sm font-medium text-[var(--color-on-surface)]">Categoria<select value={form.id_categoria} onChange={(e) => setForm({ ...form, id_categoria: e.target.value })} className="rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface)] px-3 py-2.5 font-normal outline-none focus:border-[var(--color-primary)]"><option value="">Sem categoria</option>{categorias.map((categoria) => <option key={categoria.id_categoria} value={categoria.id_categoria}>{categoria.nome_categoria}</option>)}</select></label>
+              <label className="flex flex-col gap-1.5 text-sm font-medium text-[var(--color-on-surface)]">Quantidade de exemplares *<input required min={1} type="number" value={form.quantidade_total} onChange={(e) => setForm({ ...form, quantidade_total: e.target.value })} className="rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface)] px-3 py-2.5 font-normal outline-none focus:border-[var(--color-primary)]" /></label>
+              <label className="flex items-center gap-3 self-end rounded-lg border border-[var(--color-outline-variant)] p-3 text-sm text-[var(--color-on-surface)]"><input type="checkbox" checked={form.status_livro} onChange={(e) => setForm({ ...form, status_livro: e.target.checked })} className="h-4 w-4 accent-[var(--color-primary)]" />Livro ativo no catálogo</label>
             </div>
-
-            {/* Modal Body (Scrollable) */}
-            <div className="p-6 overflow-y-auto flex-1 custom-scrollbar space-y-6">
-              {/* Basic Info */}
-              <div className="space-y-4">
-                <h4 className="font-[var(--font-family-base)] text-[length:var(--font-size-title-lg)] border-b border-[var(--color-outline-variant)] pb-2">
-                  Informações básicas
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] font-bold text-[var(--color-on-surface)]">
-                      ISBN *
-                    </label>
-                    <input
-                      className="w-full px-3 py-2 border border-[var(--color-outline-variant)] rounded-lg font-[var(--font-family-base)] focus:border-[var(--color-primary)] focus:ring-1 focus:ring-primary focus:outline-none"
-                      placeholder="e.g. 978-xxxxxxxxxx"
-                      type="text"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] font-bold text-[var(--color-on-surface)]">
-                      Título *
-                    </label>
-                    <input
-                      className="w-full px-3 py-2 border border-[var(--color-outline-variant)] rounded-lg font-[var(--font-family-base)] focus:border-[var(--color-primary)] focus:ring-1 focus:ring-primary focus:outline-none"
-                      placeholder="Título do livro"
-                      type="text"
-                    />
-                  </div>
-                  <div className="space-y-1 md:col-span-2">
-                    <label className="font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] font-bold text-[var(--color-on-surface)]">
-                      Autor(es) *
-                    </label>
-                    <input
-                      className="w-full px-3 py-2 border border-[var(--color-outline-variant)] rounded-lg font-[var(--font-family-base)] focus:border-[var(--color-primary)] focus:ring-1 focus:ring-primary focus:outline-none"
-                      placeholder="Separe os autores por vírgula"
-                      type="text"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Classificação */}
-              <div className="space-y-4">
-                <h4 className="font-[var(--font-family-base)] text-[length:var(--font-size-title-lg)] border-b border-[var(--color-outline-variant)] pb-2">
-                  Classificação
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-1">
-                    <label className="font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] font-bold text-[var(--color-on-surface)]">
-                      Categoria
-                    </label>
-                    <select className="w-full px-3 py-2 border border-[var(--color-outline-variant)] rounded-lg font-[var(--font-family-base)] focus:border-[var(--color-primary)] focus:ring-1 focus:ring-primary focus:outline-none bg-[var(--color-surface)]">
-                      <option>Selecione...</option>
-                      <option>Ficção</option>
-                      <option>Non-Ficção</option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] font-bold text-[var(--color-on-surface)]">
-                      Ano
-                    </label>
-                    <input
-                      className="w-full px-3 py-2 border border-[var(--color-outline-variant)] rounded-lg font-[var(--font-family-base)] focus:border-[var(--color-primary)] focus:ring-1 focus:ring-primary focus:outline-none"
-                      placeholder="YYYY"
-                      type="number"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Cover Upload */}
-              <div className="space-y-2">
-                <label className="font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] font-bold text-[var(--color-on-surface)]">
-                  Imagem da capa
-                </label>
-                <div className="border-2 border-dashed border-[var(--color-outline-variant)] rounded-lg p-6 flex flex-col items-center justify-center text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)] transition-colors cursor-pointer">
-                  <span className="material-symbols-outlined text-[32px] mb-2">
-                    add
-                  </span>
-                  <span className="font-[var(--font-family-base)]">
-                    Arraste ou clique para enviar
-                  </span>
-                  <span className="font-[var(--font-family-base)] text-[length:var(--font-size-label-md)] mt-1 opacity-70">
-                    JPG, PNG (máx. 2 MB)
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="px-6 py-4 border-t border-[var(--color-outline-variant)] bg-[var(--color-surface-container)] flex justify-end gap-3 rounded-b-2xl">
-              <button
-                type="button"
-                onClick={() => setIsModalOpen(false)}
-                className="inline-flex items-center gap-2 rounded-lg bg-[var(--color-primary)] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[var(--color-primary-container)]"
-              >
-                Salvar livro
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            <footer className="flex justify-end gap-3 border-t border-[var(--color-outline-variant)] bg-[var(--color-surface-container)] px-6 py-4"><button type="button" disabled={salvando} onClick={() => setModalAberto(false)} className="rounded-lg border border-[var(--color-outline-variant)] px-4 py-2.5 text-sm text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)]">Cancelar</button><button type="submit" disabled={salvando} className="inline-flex items-center gap-2 rounded-lg bg-[var(--color-primary)] px-5 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"><span className="material-symbols-outlined text-lg">{salvando ? "progress_activity" : "save"}</span>{salvando ? "Salvando..." : livroEditando ? "Salvar alterações" : "Cadastrar livro"}</button></footer>
+          </form>
+        </section>
+      </div>}
     </div>
   );
 }
