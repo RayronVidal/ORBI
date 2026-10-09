@@ -55,8 +55,25 @@ async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
       ...init.headers,
     },
   });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data?.erro || data?.mensagem || "Não foi possível concluir a operação.");
+
+  const raw = await response.text();
+  let data: any = {};
+  if (raw) {
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      data = { mensagem: raw.trim() };
+    }
+  }
+
+  if (!response.ok) {
+    const mensagem = data?.erro || data?.mensagem;
+    const detalhe = typeof mensagem === "string" && mensagem.length < 300
+      ? mensagem
+      : `A API respondeu com HTTP ${response.status}.`;
+    throw new Error(`${detalhe} (HTTP ${response.status})`);
+  }
+
   return data as T;
 }
 
@@ -133,6 +150,17 @@ function Catalogo() {
     event.preventDefault();
     setErro("");
     setSucesso("");
+
+    const codigoNormalizado = form.codigo_livro.trim().toLocaleLowerCase("pt-BR");
+    const duplicado = livros.some((livro) =>
+      livro.codigo_livro.trim().toLocaleLowerCase("pt-BR") === codigoNormalizado &&
+      livro.id_livro !== livroEditando?.id_livro
+    );
+    if (duplicado) {
+      setErro("Já existe um livro com este código no catálogo da sua instituição. Confira o código ou edite o livro existente para atualizar a quantidade de exemplares.");
+      return;
+    }
+
     setSalvando(true);
     const payload = {
       titulo_livro: form.titulo_livro.trim(),
