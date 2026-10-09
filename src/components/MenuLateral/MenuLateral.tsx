@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import Logo1 from '../../assets/imagens/Logo1.png';
 
 const linksPrincipais = [
@@ -17,6 +17,7 @@ const linksInferiores = [
 
 function MenuLateral() {
   const [recolhido, setRecolhido] = useState(false);
+  const navigate = useNavigate();
   const [menuMobileAberto, setMenuMobileAberto] = useState(false);
 
   useEffect(() => {
@@ -137,8 +138,12 @@ function MenuLateral() {
             type="button"
             title={recolhido ? 'Sair' : undefined}
             onClick={() => {
+              sessionStorage.removeItem('token');
+              sessionStorage.removeItem('usuario');
+              localStorage.removeItem('token');
+              localStorage.removeItem('usuario');
               setMenuMobileAberto(false);
-              // A ação de logout pode ser conectada aqui quando a autenticação estiver implementada.
+              navigate('/');
             }}
             className={`flex w-full items-center rounded-lg py-3 text-[var(--color-error)] transition-colors hover:bg-surface-container-highest hover:text-red-500 ${recolhido ? 'justify-center px-2' : 'gap-3 px-4'}`}
           >
