@@ -8,8 +8,6 @@ type Livro = {
   autor_livro: string | null;
   isbn: string | null;
   id_categoria: number | null;
-  quantidade_total: number;
-  quantidade_disponivel: number;
   status_livro: boolean;
   status_exibicao?: string;
   tbl_categorias?: Categoria | null;
@@ -20,14 +18,13 @@ type LivroForm = {
   autor_livro: string;
   isbn: string;
   id_categoria: string;
-  quantidade_total: string;
   status_livro: boolean;
 };
 
 const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\/$/, "");
 const EMPTY_FORM: LivroForm = {
   titulo_livro: "", codigo_livro: "", autor_livro: "", isbn: "",
-  id_categoria: "", quantidade_total: "1", status_livro: true,
+  id_categoria: "", status_livro: true,
 };
 
 function getToken() {
@@ -79,8 +76,7 @@ async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
 
 function statusLivro(livro: Livro) {
   if (!livro.status_livro) return "Inativo";
-  if (livro.quantidade_disponivel > 0) return "Disponível";
-  return "Emprestado";
+  return livro.status_exibicao || "Disponível";
 }
 
 function Catalogo() {
@@ -139,7 +135,6 @@ function Catalogo() {
       autor_livro: livro.autor_livro || "",
       isbn: livro.isbn || "",
       id_categoria: livro.id_categoria ? String(livro.id_categoria) : "",
-      quantidade_total: String(livro.quantidade_total || 1),
       status_livro: Boolean(livro.status_livro),
     } : EMPTY_FORM);
     setModalAberto(true);
@@ -157,7 +152,7 @@ function Catalogo() {
       livro.id_livro !== livroEditando?.id_livro
     );
     if (duplicado) {
-      setErro("Já existe um livro com este código no catálogo da sua instituição. Confira o código ou edite o livro existente para atualizar a quantidade de exemplares.");
+      setErro("Já existe um livro com este código no catálogo da sua instituição. Cada exemplar precisa ter um código único.");
       return;
     }
 
@@ -168,7 +163,6 @@ function Catalogo() {
       autor_livro: form.autor_livro.trim(),
       isbn: form.isbn.trim(),
       id_categoria: form.id_categoria ? Number(form.id_categoria) : null,
-      quantidade_total: Number(form.quantidade_total),
       status_livro: form.status_livro,
     };
     try {
@@ -276,7 +270,7 @@ function Catalogo() {
                     <td className="px-4 py-4"><div className="flex items-center gap-3"><div className="flex h-12 w-10 shrink-0 items-center justify-center rounded bg-[var(--color-surface-container-highest)]"><span className="material-symbols-outlined text-[var(--color-on-surface-variant)]">menu_book</span></div><div className="min-w-0"><p className="font-semibold text-[var(--color-on-surface)]">{livro.titulo_livro}</p><p className="mt-0.5 text-xs text-[var(--color-on-surface-variant)]">{livro.autor_livro || "Autor não informado"} · Código: {livro.codigo_livro}</p></div></div></td>
                     <td className="px-4 py-4 text-[var(--color-on-surface)]">{livro.isbn || "—"}</td>
                     <td className="px-4 py-4 text-[var(--color-on-surface)]">{livro.tbl_categorias?.nome_categoria || "Sem categoria"}</td>
-                    <td className="px-4 py-4"><div className="flex flex-col items-start gap-1"><span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${classeStatus(status)}`}>{status}</span><span className="text-xs text-[var(--color-on-surface-variant)]">{livro.quantidade_disponivel} de {livro.quantidade_total} disponíveis</span></div></td>
+                    <td className="px-4 py-4"><div className="flex flex-col items-start gap-1"><span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${classeStatus(status)}`}>{status}</span></div></td>
                     <td className="px-4 py-4 text-right"><div className="relative inline-block text-left"><button type="button" aria-label={`Ações para ${livro.titulo_livro}`} aria-expanded={acoesAbertas === livro.id_livro} onClick={() => setAcoesAbertas(acoesAbertas === livro.id_livro ? null : livro.id_livro)} className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-outline-variant)] px-3 py-2 text-xs text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)]"><span className="material-symbols-outlined text-lg">more_horiz</span>Ações<span className="material-symbols-outlined text-base">{acoesAbertas === livro.id_livro ? "expand_less" : "expand_more"}</span></button>
                       {acoesAbertas === livro.id_livro && <div className="absolute right-0 z-20 mt-2 w-48 rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface-container-lowest)] py-1 text-left shadow-xl"><button type="button" onClick={() => abrirCadastro(livro)} className="flex w-full items-center gap-2 px-3 py-2.5 text-sm hover:bg-[var(--color-surface-container-low)]"><span className="material-symbols-outlined text-lg">edit</span>Editar livro</button><button type="button" onClick={() => void alternarStatus(livro)} className="flex w-full items-center gap-2 px-3 py-2.5 text-sm hover:bg-[var(--color-surface-container-low)]"><span className="material-symbols-outlined text-lg">{livro.status_livro ? "visibility_off" : "visibility"}</span>{livro.status_livro ? "Desativar livro" : "Ativar livro"}</button><button type="button" onClick={() => void excluirLivro(livro)} className="flex w-full items-center gap-2 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50"><span className="material-symbols-outlined text-lg">delete</span>Excluir livro</button></div>}
                     </div></td>
@@ -299,7 +293,6 @@ function Catalogo() {
               <label className="flex flex-col gap-1.5 text-sm font-medium text-[var(--color-on-surface)] sm:col-span-2">Autor(es)<input maxLength={255} value={form.autor_livro} onChange={(e) => setForm({ ...form, autor_livro: e.target.value })} className="rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface)] px-3 py-2.5 font-normal outline-none focus:border-[var(--color-primary)]" placeholder="Nome do autor" /></label>
               <label className="flex flex-col gap-1.5 text-sm font-medium text-[var(--color-on-surface)]">ISBN<input maxLength={20} value={form.isbn} onChange={(e) => setForm({ ...form, isbn: e.target.value })} className="rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface)] px-3 py-2.5 font-normal outline-none focus:border-[var(--color-primary)]" placeholder="ISBN (opcional)" /></label>
               <label className="flex flex-col gap-1.5 text-sm font-medium text-[var(--color-on-surface)]">Categoria<select value={form.id_categoria} onChange={(e) => setForm({ ...form, id_categoria: e.target.value })} className="rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface)] px-3 py-2.5 font-normal outline-none focus:border-[var(--color-primary)]"><option value="">Sem categoria</option>{categorias.map((categoria) => <option key={categoria.id_categoria} value={categoria.id_categoria}>{categoria.nome_categoria}</option>)}</select></label>
-              <label className="flex flex-col gap-1.5 text-sm font-medium text-[var(--color-on-surface)]">Quantidade de exemplares *<input required min={1} type="number" value={form.quantidade_total} onChange={(e) => setForm({ ...form, quantidade_total: e.target.value })} className="rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface)] px-3 py-2.5 font-normal outline-none focus:border-[var(--color-primary)]" /></label>
               <label className="flex items-center gap-3 self-end rounded-lg border border-[var(--color-outline-variant)] p-3 text-sm text-[var(--color-on-surface)]"><input type="checkbox" checked={form.status_livro} onChange={(e) => setForm({ ...form, status_livro: e.target.checked })} className="h-4 w-4 accent-[var(--color-primary)]" />Livro ativo no catálogo</label>
             </div>
             <footer className="flex justify-end gap-3 border-t border-[var(--color-outline-variant)] bg-[var(--color-surface-container)] px-6 py-4"><button type="button" disabled={salvando} onClick={() => setModalAberto(false)} className="rounded-lg border border-[var(--color-outline-variant)] px-4 py-2.5 text-sm text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)]">Cancelar</button><button type="submit" disabled={salvando} className="inline-flex items-center gap-2 rounded-lg bg-[var(--color-primary)] px-5 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"><span className="material-symbols-outlined text-lg">{salvando ? "progress_activity" : "save"}</span>{salvando ? "Salvando..." : livroEditando ? "Salvar alterações" : "Cadastrar livro"}</button></footer>
